@@ -38,7 +38,7 @@ for entry in progList:
 print(len(progList))
 print()
 
-# Substrings for master programme's
+# Substrings for master programmes
 CLSstring = ['Computational', 'computational']
 AIstring = ['Artificial', 'AI']
 QRMstring = ['Quantitative Risk', 'QRM', 'qrm', 'Quantitative risk',
