@@ -161,7 +161,7 @@ for i, p in enumerate(wedges):
     ax.annotate(labels[i], xy=(x, y), xytext=(1.35*np.sign(x), 1.4*y),
                 horizontalalignment=horizontalalignment, **kw, size=14)
 
-# Save pie chart
+# Save pie chart => .../DM122/plots
 filePath='..//plots//'
 fileDir = os.path.dirname(os.path.realpath('__file__'))
 plotPath = os.path.join(fileDir, filePath) #'../data/test.csv')
@@ -170,7 +170,7 @@ plotName = 'MscProgrammesPieChart.png'
 plt.savefig(os.path.join(plotPath, plotName))
 plt.show()
 
-# Save cleaned data to csv
+# Save cleaned data to csv => .../DM122/data
 csvName='cleaned.csv'
 filePath = '..//data//' + csvName
 fileDir = os.path.dirname(os.path.realpath('__file__'))
