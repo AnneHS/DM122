@@ -3,6 +3,9 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import re
+from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
+
 '''
 Clean
 
@@ -21,11 +24,11 @@ csvPath = os.path.abspath(os.path.realpath(csvPath))
 df = pd.read_csv(csvPath, sep=';', engine='python')
 
 # change column names
-print(df.columns)
+#print(df.columns)
 df.columns = ['Programme', 'ML', 'IR', 'Statistics',
 'Databases', 'Gender', 'Chocolate', 'Birthday', 'Neighbors', 'StandUp', 'StressLvl',
 'Competition', 'RandomNr', 'BedTime', 'GoodDay1', 'GoodDay2']
-print(df.columns)
+#print(df.columns)
 
 # CLEAN PROGRAMME COLUMNS
 progData = df['Programme']
@@ -177,3 +180,26 @@ fileDir = os.path.dirname(os.path.realpath('__file__'))
 csvPath = os.path.join(fileDir, filePath)
 csvPath = os.path.abspath(os.path.realpath(csvPath))
 progData.to_csv(csvPath, header='Programme')
+
+
+
+# What makes a good day?
+gd1Data = df['GoodDay1']
+gd2Data = df['GoodDay2']
+
+# Concatenate entries
+text1 = " ".join(entry for entry in gd1Data)
+text2 = " ".join(entry for entry in gd2Data)
+text = text1 + text2
+
+# Create and generate a word cloud image:
+wordcloud = WordCloud(width=800, height=400, colormap='Pastel1').generate(text)
+
+# Display the generated image:
+plt.imshow(wordcloud, interpolation='bilinear')
+plt.axis("off")
+
+# Save
+plotName = 'GoodDayWordChart.png'
+plt.savefig(os.path.join(plotPath, plotName))
+plt.show()
