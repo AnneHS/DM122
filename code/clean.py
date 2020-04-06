@@ -6,7 +6,7 @@ import numpy as np
 '''
 Clean
 
-For the Programme column
+For the Msc Programmes column
 '''
 
 fileName='ODI-2020.csv'
