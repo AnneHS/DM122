@@ -192,10 +192,8 @@ text1 = " ".join(entry for entry in gd1Data)
 text2 = " ".join(entry for entry in gd2Data)
 text = text1 + text2
 
-# Create and generate a word cloud image:
+# Create and generate a word cloud image
 wordcloud = WordCloud(width=800, height=400, colormap='Pastel1').generate(text)
-
-# Display the generated image:
 plt.imshow(wordcloud, interpolation='bilinear')
 plt.axis("off")
 
