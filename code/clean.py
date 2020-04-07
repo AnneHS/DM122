@@ -250,3 +250,114 @@ for i, entry in enumerate(compData):
         count+=1
 print(count)
 '''
+
+
+# Adding code for bed time vs gender and distribution of random numbers
+
+#copying this bit to get the path
+fileName='ODI-2020.xlsx'
+filePath = '..//data//' + fileName
+
+# get path
+fileDir = os.path.dirname(os.path.realpath('__file__'))
+excelpath = os.path.join(fileDir, filePath)
+excelpath = os.path.abspath(os.path.realpath(csvPath))
+
+df = pd.read_excel (r'C:\Users\39331\Desktop\UvA\Data Mining\hw\project 1\DM122\data\ODI-2020.xlsx')
+
+#bed time vs gender
+plt.close()
+gend = df.iloc[:, [5,13]]
+gend.iloc[:,1] = gend.iloc[:,1].replace({':':'.'}, regex=True)
+gend.iloc[:,1] = gend.iloc[:,1].replace({'am':''}, regex=True)
+gend.iloc[:,1] = gend.iloc[:,1].replace({'AM':''}, regex=True)
+
+
+for i in range(len(gend)):
+    if type(gend.iloc[i,1])== str and 'pm' in gend.iloc[i,1]:
+            gend.iloc[i,1] = gend.iloc[i,1].replace('pm','')
+            gend.iloc[i,1] = float(gend.iloc[i,1])
+            gend.iloc[i,1] = gend.iloc[i,1] + 12.0
+            
+for i in range(len(gend)):
+    if type(gend.iloc[i,1])== int or type(gend.iloc[i,1])== float and gend.iloc[i,1]>99:
+        gend.iloc[i,1] = gend.iloc[i,1] /100.0
+    if type(gend.iloc[i,1])== int and gend.iloc[i,1]>24 and gend.iloc[i,1]<0:
+        gend.iloc[i,1] = np.nan
+    if type(gend.iloc[i,1]) == str:
+        gend.iloc[i:,1] = pd.to_numeric(gend.iloc[i:,1], downcast="float", errors='coerce')
+        if gend.iloc[i,1]>99:
+            gend.iloc[i,1] = gend.iloc[i,1] /100.0
+        
+gend.iloc[:,1] = pd.to_numeric(gend.iloc[:,1], downcast="float", errors='coerce')
+
+    
+bedt=gend.iloc[:,1].values
+gender = gend.iloc[:,0].values
+
+
+male = []
+female = []
+unknown = []
+
+for i in range(len(gender)):
+    if gender[i] == 'male' and bedt[i] <25: 
+        male.append(bedt[i])
+    elif gender[i]== 'female' and bedt[i]<25: 
+        female.append(bedt[i])
+    elif bedt[i]<25:
+         unknown.append(bedt[i])
+
+bins = np.linspace(0, 24, 1)
+plt.hist([male, female], bins=24, density=True, label = ['male', 'female'])
+plt.legend()
+my_xticks = ['00:00','2:00','4:00','6:00', "8:00", "10:00", '12:00','14:00','16:00', "18:00", "20:00", "22:00" ]
+plt.xlim(0,24)
+plt.xticks(np.arange(0,24,2), my_xticks, rotation=45)
+plt.xlabel("Bed Time", fontsize = 13)
+plt.ylabel("Percentage of Students by Gender", fontsize = 13)
+
+
+# Save pie chart => .../DM122/plots
+filePath='..//plots//'
+fileDir = os.path.dirname(os.path.realpath('__file__'))
+plotPath = os.path.join(fileDir, filePath) #'../data/test.csv')
+plotPath = os.path.abspath(os.path.realpath(plotPath))
+plotName = "gender_bed_times.png"
+plt.savefig(os.path.join(plotPath, plotName))
+plt.close()
+
+#PLOT FOR DISTRIBUTION OF RANDOM NUMBERS
+
+random = df.iloc[:, 12]
+
+random = pd.to_numeric(random, downcast="float", errors='coerce')
+    
+random=random.values
+count = np.zeros(4)
+
+for i in range(len(random)):
+    if random[i]>1000:
+        count[3] += 1
+        random[i] = np.nan
+    elif random[i]>100:
+        count[2] += 1
+    elif random[i]>10:
+        count[1] += 1
+    else:
+        count[0] += 1
+
+bins=np.arange(-1,1000,1)
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10,5))
+ax1.hist(random, bins)
+ax1.set_xlim(-5, 105)
+ax1.set_xlabel('Random number selected', fontsize=13)
+ax1.set_ylabel("Frequency", fontsize=13)
+ax2.hist(random, bins)
+ax2.set_xlim(-5, 25)
+ax2.set_xlabel('Random number selected', fontsize=13)
+ax2.set_ylabel("Frequency", fontsize=13)
+plt.tight_layout()
+plotName = "distribution_rand_numbers.png"
+plt.savefig(os.path.join(plotPath, plotName))
+plt.close()
