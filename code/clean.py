@@ -171,7 +171,7 @@ plotPath = os.path.join(fileDir, filePath) #'../data/test.csv')
 plotPath = os.path.abspath(os.path.realpath(plotPath))
 plotName = 'MscProgrammesPieChart.png'
 plt.savefig(os.path.join(plotPath, plotName))
-plt.show()
+#plt.show()
 
 # Save cleaned data to csv => .../DM122/data
 csvName='cleaned.csv'
@@ -200,4 +200,53 @@ plt.axis("off")
 # Save
 plotName = 'GoodDayWordChart.png'
 plt.savefig(os.path.join(plotPath, plotName))
-plt.show()
+#plt.show()
+
+stressData = df['StressLvl']
+csvName='stressCleaned.csv'
+filePath = '..//data//' + csvName
+fileDir = os.path.dirname(os.path.realpath('__file__'))
+csvPath = os.path.join(fileDir, filePath)
+csvPath = os.path.abspath(os.path.realpath(csvPath))
+stressData.to_csv(csvPath, header='Programme')
+
+'''
+DIFFERENT COURSES (currently not used)
+mlData = df['ML']
+irData = df['IR']
+statData = df['Statistics']
+dbData = df['Databases']
+
+n=len(mlData)
+init = np.zeros((n))
+d={'Courses': pd.Series(init)}
+courseDF = pd.DataFrame(d)
+
+for i, entry in enumerate(mlData):
+    if entry == 'yes':
+        courseDF.loc[i] +=1
+
+for i, entry in enumerate(irData):
+    if entry == 1:
+        courseDF.loc[i] +=1
+
+for i, entry in enumerate(statData):
+    if entry == 'mu':
+        courseDF.loc[i] +=1
+
+for i, entry in enumerate(dbData):
+    if entry == 'ja':
+        courseDF.loc[i] +=1
+print(courseDF)
+
+# Print nondigit answers for competition question
+count=0
+compData = df['Competition']
+for i, entry in enumerate(compData):
+    if not entry.isdigit():
+        print(entry)
+        courseDF.drop(i)
+        compData.drop(labels=i)
+        count+=1
+print(count)
+'''
