@@ -7,9 +7,29 @@ import re
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 
 '''
-Clean
+Cleans various columns of ODI-2020.csv and creates corresponding plots.
 
-For the Msc Programmes column
+Master Programme:
+1. Inventarisation of unique entries in Master Programme column.
+2. Picks one term/name for each unique master programme and replaces all
+    entries using a different term for referring to that same programme,
+    with this term (e.g. AI for all entries referring to Artificial Intelligence)
+3. Creates and saves Pie chart
+    ...DM122/plots/mscProgrammesPieChart.png
+4. 'Cleaned' data is saved to csv
+    ...DM122/plots/mscCleaned
+* Information Studies and Information Science merged into one category;
+Information Science
+
+Good Day 1 & 2
+1. Extracts all entries from the 2 'What makes a good day' columns.
+2. Creates and saves a Word Chart based on these entries
+    ...DM122/data/GoodDatWordChart.png
+
+Stress level
+Extracts Stress level column and saves in seperate csv-file
+    ...DM122/data/stressCleaned.csv
+* Actual cleaning happened manually
 '''
 
 fileName='ODI-2020.csv'
@@ -174,7 +194,7 @@ plt.savefig(os.path.join(plotPath, plotName))
 #plt.show()
 
 # Save cleaned data to csv => .../DM122/data
-csvName='cleaned.csv'
+csvName='mscCleaned.csv'
 filePath = '..//data//' + csvName
 fileDir = os.path.dirname(os.path.realpath('__file__'))
 csvPath = os.path.join(fileDir, filePath)
@@ -209,6 +229,8 @@ fileDir = os.path.dirname(os.path.realpath('__file__'))
 csvPath = os.path.join(fileDir, filePath)
 csvPath = os.path.abspath(os.path.realpath(csvPath))
 stressData.to_csv(csvPath, header='Programme')
+
+
 
 '''
 DIFFERENT COURSES (currently not used)
@@ -278,7 +300,7 @@ for i in range(len(gend)):
             gend.iloc[i,1] = gend.iloc[i,1].replace('pm','')
             gend.iloc[i,1] = float(gend.iloc[i,1])
             gend.iloc[i,1] = gend.iloc[i,1] + 12.0
-            
+
 for i in range(len(gend)):
     if type(gend.iloc[i,1])== int or type(gend.iloc[i,1])== float and gend.iloc[i,1]>99:
         gend.iloc[i,1] = gend.iloc[i,1] /100.0
@@ -288,10 +310,10 @@ for i in range(len(gend)):
         gend.iloc[i:,1] = pd.to_numeric(gend.iloc[i:,1], downcast="float", errors='coerce')
         if gend.iloc[i,1]>99:
             gend.iloc[i,1] = gend.iloc[i,1] /100.0
-        
+
 gend.iloc[:,1] = pd.to_numeric(gend.iloc[:,1], downcast="float", errors='coerce')
 
-    
+
 bedt=gend.iloc[:,1].values
 gender = gend.iloc[:,0].values
 
@@ -301,9 +323,9 @@ female = []
 unknown = []
 
 for i in range(len(gender)):
-    if gender[i] == 'male' and bedt[i] <25: 
+    if gender[i] == 'male' and bedt[i] <25:
         male.append(bedt[i])
-    elif gender[i]== 'female' and bedt[i]<25: 
+    elif gender[i]== 'female' and bedt[i]<25:
         female.append(bedt[i])
     elif bedt[i]<25:
          unknown.append(bedt[i])
@@ -332,7 +354,7 @@ plt.close()
 random = df.iloc[:, 12]
 
 random = pd.to_numeric(random, downcast="float", errors='coerce')
-    
+
 random=random.values
 count = np.zeros(4)
 
