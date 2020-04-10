@@ -160,7 +160,7 @@ for entry in progData:
         progDict[entry]+=1
     else:
         progDict[entry]=1
-
+progDict={k: v for k, v in sorted(progDict.items(), key=lambda item: item[1], reverse=True)}
 # Plot pie chart
 # Documentation: https://matplotlib.org/3.1.1/gallery/pie_and_polar_charts/pie_and_donut_labels.html
 fig, ax = plt.subplots(figsize=(12, 6), subplot_kw=dict(aspect="equal"))
@@ -168,8 +168,24 @@ fig, ax = plt.subplots(figsize=(12, 6), subplot_kw=dict(aspect="equal"))
 labels = [(str(prog) + " (" + str(progDict[prog]) + ")") for prog in progDict]
 data = [amount for amount in progDict.values()]
 
-wedges, texts = ax.pie(data, wedgeprops=dict(width=0.5), startangle=-40)
+#clmap=plt.get_cmap("tab20b")
+#colors= clmap(range(20))
+NUM_COLORS=25
+cm=plt.get_cmap('gist_ncar')
+colors=[cm(1.*i/NUM_COLORS) for i in range(NUM_COLORS)]
+#for i in range(NUM_COLORS):
+#    colors.append(cm(i//3*3.0/NUM_COLORS))
+wedges, texts = ax.pie(data, colors=colors, wedgeprops=dict(width=0.5), startangle=-40)
 
+for w in wedges:
+    w.set_linewidth(1)
+    w.set_edgecolor('white')
+ax.legend(wedges, labels,
+          title="Programmes",
+          loc="center left",
+          bbox_to_anchor=(1, 0, 0.5, 1))
+
+'''
 bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0.72)
 kw = dict(arrowprops=dict(arrowstyle="-"),
           bbox=bbox_props, zorder=0, va="center")
@@ -183,6 +199,8 @@ for i, p in enumerate(wedges):
     kw["arrowprops"].update({"connectionstyle": connectionstyle})
     ax.annotate(labels[i], xy=(x, y), xytext=(1.35*np.sign(x), 1.4*y),
                 horizontalalignment=horizontalalignment, **kw, size=14)
+'''
+
 
 # Save pie chart => .../DM122/plots
 filePath='..//plots//'
@@ -191,7 +209,7 @@ plotPath = os.path.join(fileDir, filePath) #'../data/test.csv')
 plotPath = os.path.abspath(os.path.realpath(plotPath))
 plotName = 'MscProgrammesPieChart.png'
 plt.savefig(os.path.join(plotPath, plotName))
-#plt.show()
+plt.show()
 
 # Save cleaned data to csv => .../DM122/data
 csvName='mscCleaned.csv'
