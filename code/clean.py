@@ -232,8 +232,7 @@ csvPath = os.path.abspath(os.path.realpath(csvPath))
 
 
 
-'''
-DIFFERENT COURSES (currently not used)
+#DIFFERENT COURSES (currently not used)
 mlData = df['ML']
 irData = df['IR']
 statData = df['Statistics']
@@ -247,19 +246,55 @@ courseDF = pd.DataFrame(d)
 for i, entry in enumerate(mlData):
     if entry == 'yes':
         courseDF.loc[i] +=1
+        mlData.loc[i] = 1
+    else:
+        mlData.loc[i] =0
 
 for i, entry in enumerate(irData):
     if entry == 1:
         courseDF.loc[i] +=1
-
+    else:
+        irData.loc[i] =0
 for i, entry in enumerate(statData):
     if entry == 'mu':
         courseDF.loc[i] +=1
+        statData.loc[i] = 1
+    else:
+        statData.loc[i] =0
 
 for i, entry in enumerate(dbData):
     if entry == 'ja':
         courseDF.loc[i] +=1
+        dbData.loc[i] = 1
+    else:
+        dbData.loc[i] =0
 print(courseDF)
+
+fileNameRegression='dataset_for_regression.csv'
+filePath = '..//data//' + fileNameRegression
+
+# get path
+fileDir = os.path.dirname(os.path.realpath('__file__'))
+csvPath = os.path.join(fileDir, filePath)
+csvPath = os.path.abspath(os.path.realpath(csvPath))
+
+# read data
+regData = pd.read_csv(csvPath, engine='python')
+regData['Machine Learning'] = mlData
+regData['Information Retrieval'] = irData
+regData['Statistics'] = statData
+regData['Databases'] = dbData
+del regData['Num courses']
+regData = regData[['Gender', 'Year of Birth', 'Bed Time', 'Machine Learning',
+    'Information Retrieval', 'Statistics', 'Databases', 'StressLvl']]
+
+csvName='regression_with_courses.csv'
+filePath = '..//data//' + csvName
+fileDir = os.path.dirname(os.path.realpath('__file__'))
+csvPath = os.path.join(fileDir, filePath)
+csvPath = os.path.abspath(os.path.realpath(csvPath))
+regData.to_csv(csvPath, header='Programme')
+
 
 # Print nondigit answers for competition question
 count=0
@@ -271,7 +306,6 @@ for i, entry in enumerate(compData):
         compData.drop(labels=i)
         count+=1
 print(count)
-'''
 
 
 # Adding code for bed time vs gender and distribution of random numbers
@@ -383,3 +417,5 @@ plt.tight_layout()
 plotName = "distribution_rand_numbers.png"
 plt.savefig(os.path.join(plotPath, plotName))
 plt.close()
+
+print('jo')
