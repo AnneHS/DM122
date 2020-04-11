@@ -139,6 +139,12 @@ for i in progData.index:
     elif 'Mechenaical' in progData.loc[i]:
         progData.loc[i] = 'Mechanical Engineering'
 
+    elif 'Human movement' in progData.loc[i]:
+        progData.loc[i] = 'Human Movement'
+
+    elif 'medical informatics'in progData.loc[i]:
+        progData.loc[i] = 'Medical Informatics'
+        
     # Exchange
     elif any(substr in progData.loc[i] for substr in EXCstring):
         progData.loc[i] = 'Exchange'
@@ -208,7 +214,7 @@ fileDir = os.path.dirname(os.path.realpath('__file__'))
 plotPath = os.path.join(fileDir, filePath) #'../data/test.csv')
 plotPath = os.path.abspath(os.path.realpath(plotPath))
 plotName = 'MscProgrammesPieChart.png'
-plt.savefig(os.path.join(plotPath, plotName))
+plt.savefig(os.path.join(plotPath, plotName), bbox_inches='tight')
 plt.show()
 
 # Save cleaned data to csv => .../DM122/data
