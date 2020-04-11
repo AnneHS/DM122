@@ -88,8 +88,8 @@ width = 0.35         # the width of the bars
 p1 = ax.bar(ind, survivalTotals, width, bottom=0)
 p2 =  ax.bar(ind+width, deathTotals, width, bottom=0)
 ax.set_xticks(ind + width / 2)
-ax.set_xticklabels(('First', 'Second', 'Third'))
-ax.legend((p1[0], p2[0]), ('Death', 'Survived'))
+ax.set_xticklabels(('Upper', 'Middle', 'Lower'))
+ax.legend((p1[0], p2[0]), ('Survived', 'Death'))
 
 # Save plot
 filePath='..//plots//titanic//'
@@ -97,5 +97,45 @@ fileDir = os.path.dirname(os.path.realpath('__file__'))
 plotPath = os.path.join(fileDir, filePath) #'../data/test.csv')
 plotPath = os.path.abspath(os.path.realpath(plotPath))
 plotName = 'ClassSurvivalBarChart.png'
+plt.savefig(os.path.join(plotPath, plotName), bbox_inches='tight')
+plt.show()
+
+genderData=df['Sex']
+maleDeath=0
+maleSurvived=0
+femaleDeath=0
+femaleSurvived=0
+for i, entry in enumerate(genderData):
+    if entry == 'male':
+        if survivalData.loc[i] == 0:
+            maleDeath+=1
+        elif survivalData.loc[i] ==1:
+            maleSurvived+=1
+    elif entry == 'female':
+        if survivalData.loc[i] == 0:
+            femaleDeath+=1
+        elif survivalData.loc[i] ==1:
+            femaleSurvived+=1
+
+deathTotals = (maleDeath, femaleDeath)
+survivalTotals = (maleSurvived, femaleSurvived)
+
+# Barchart that shows #deaths & #survival per passenger class
+N=2
+fig, ax = plt.subplots()
+ind = np.arange(N)    # the x locations for the groups
+width = 0.35         # the width of the bars
+p1 = ax.bar(ind, survivalTotals, width, bottom=0)
+p2 =  ax.bar(ind+width, deathTotals, width, bottom=0)
+ax.set_xticks(ind + width / 2)
+ax.set_xticklabels(('Male', 'Female'))
+ax.legend((p1[0], p2[0]), ('Survived', 'Death'))
+
+# Save plot
+filePath='..//plots//titanic//'
+fileDir = os.path.dirname(os.path.realpath('__file__'))
+plotPath = os.path.join(fileDir, filePath) #'../data/test.csv')
+plotPath = os.path.abspath(os.path.realpath(plotPath))
+plotName = 'GenderSurvivalBarChart.png'
 plt.savefig(os.path.join(plotPath, plotName), bbox_inches='tight')
 plt.show()
