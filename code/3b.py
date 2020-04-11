@@ -16,9 +16,9 @@ csvPath = os.path.join(fileDir, filePath)
 csvPath = os.path.abspath(os.path.realpath(csvPath))
 
 # read data
-df = pd.read_csv(csvPath, sep=';', engine='python')
+df = pd.read_csv(csvPath, sep=',', engine='python')
 
-print(df.head())
+#print(df.head())
 df.fillna(df.mean(), inplace=True)
 
 X = df.iloc[:,1:] # X is the features in our dataset
@@ -66,22 +66,19 @@ plt.xlabel("predicted")
 plt.ylabel("observed")
 plt.show()
 
-
 plt.scatter(np.arange(len(y_test)), abs(predicted_y - y_test))
 plt.ylabel("Samples", fontsize = 13)
 plt.xlabel("Absolute residual", fontsize=13)
 plt.show()
 
 #TRY RANSAC FIT...IGNORES OUTLIERS A BIT MORE
-
+print("RANSAC")
 ransac = RANSACRegressor()
 ransac.fit(X_train, y_train)
 print(ransac.score(X_test, y_test))
 
-# Predict data of estimated models
 predicted_y = ransac.predict(X_test)
 
-# Compare estimated coefficients
 print("Estimated coefficients (true, linear regression, RANSAC):")
 print(ransac.estimator_.coef_)
 
@@ -92,12 +89,11 @@ print('Coefficient of determination: %.2f'% r2_score(y_test, predicted_y))
 
 #TRY OTHER SIMPLE LINEAR REGRESSOR
 from sklearn.linear_model import ElasticNet
-
+print("ELASTIC NET")
 model = ElasticNet().fit(X_train, y_train)
 model.score(X_test, y_test)
 
-
-predicted_y = gpr.predict(X_test)
+predicted_y = model.predict(X_test)
 print("Estimated coefficients gpr:")
 #print(gpr.estimator_.coef_)
 
@@ -108,10 +104,9 @@ print('Coefficient of determination: %.2f'% r2_score(y_test, predicted_y))
 
 # TRY OTHER REGRESSOR THAT IGNORES OUTLIERS
 from sklearn.linear_model import TheilSenRegressor
-
+print("THE IL SEN REGRESSOR")
 model = TheilSenRegressor().fit(X_train, y_train)
 model.score(X_test, y_test)
-
 
 predicted_y = model.predict(X_test)
 
