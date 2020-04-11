@@ -28,9 +28,28 @@ for entry in survivalData:
     else:
         print(entry)
 
+print('Survival')
 print('Total: '+ str(total))
 print('Deaths: ' + str(deaths))
 print('Survived: ' + str(survived))
+print()
 
-#Pclass
+#Passenger classes
 classData = df['Pclass']
+one=0
+two=0
+three=0
+for entry in classData:
+    if entry == 1:
+        one+=1
+    elif entry == 2:
+        two+=1
+    elif entry == 3:
+        three+=1
+    else:
+        print(entry)
+
+print('Passenger class')
+print('First class: ' + str(one))
+print('Second class: ' + str(two))
+print('Third class: ' + str(three))
