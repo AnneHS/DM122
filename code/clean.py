@@ -139,6 +139,12 @@ for i in progData.index:
     elif 'Mechenaical' in progData.loc[i]:
         progData.loc[i] = 'Mechanical Engineering'
 
+    elif 'Human movement' in progData.loc[i]:
+        progData.loc[i] = 'Human Movement'
+
+    elif 'medical informatics'in progData.loc[i]:
+        progData.loc[i] = 'Medical Informatics'
+
     # Exchange
     elif any(substr in progData.loc[i] for substr in EXCstring):
         progData.loc[i] = 'Exchange'
@@ -208,7 +214,7 @@ fileDir = os.path.dirname(os.path.realpath('__file__'))
 plotPath = os.path.join(fileDir, filePath) #'../data/test.csv')
 plotPath = os.path.abspath(os.path.realpath(plotPath))
 plotName = 'MscProgrammesPieChart.png'
-plt.savefig(os.path.join(plotPath, plotName))
+plt.savefig(os.path.join(plotPath, plotName), bbox_inches='tight')
 plt.show()
 
 # Save cleaned data to csv => .../DM122/data
@@ -225,20 +231,33 @@ progData.to_csv(csvPath, header='Programme')
 gd1Data = df['GoodDay1']
 gd2Data = df['GoodDay2']
 
+dayList =[]
+for entry in gd1Data:
+    if entry not in dayList:
+        dayList.append(entry)
+for entry in gd2Data:
+    if entry not in dayList:
+        dayList.append(entry)
+
+for entry in dayList:
+    print(entry)
+print(len(dayList))
+print()
+
 # Concatenate entries
 text1 = " ".join(entry for entry in gd1Data)
 text2 = " ".join(entry for entry in gd2Data)
 text = text1 + text2
 
 # Create and generate a word cloud image
-wordcloud = WordCloud(width=800, height=400, colormap='Pastel1').generate(text)
+wordcloud = WordCloud(width=800, height=400, min_font_size=15, background_color='white', colormap='tab20').generate(text)
 plt.imshow(wordcloud, interpolation='bilinear')
 plt.axis("off")
 
 # Save
 plotName = 'GoodDayWordChart.png'
-plt.savefig(os.path.join(plotPath, plotName))
-#plt.show()
+plt.savefig(os.path.join(plotPath, plotName), bbox_inches='tight')
+plt.show()
 
 stressData = df['StressLvl']
 csvName='stressCleaned.csv'
