@@ -114,8 +114,6 @@ model.score(X_test, y_test)
 
 
 predicted_y = model.predict(X_test)
-print("Estimated coefficients gpr:")
-#print(gpr.estimator_.coef_)
 
 print('Mean SQUARE error: %.2f'% mean_squared_error(y_test, predicted_y))
 print('Mean ABSOLUTE error: %.2f'% mean_absolute_error(y_test, predicted_y))
