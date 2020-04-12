@@ -144,20 +144,17 @@ plt.show()
 
 '''
 
-ageData = df['Age']
-x=[]
-y=[]
-for i, entry in enumerate(ageData):
-    if isinstance(entry, int):
-        x.app
-
-unknown=0
+# Get cabin data
 cabinData = df['Cabin']
 
+# Get row indices of missing entries
 loc = np.where(pd.isnull(cabinData))
 rows=loc[0]
 
+# Assign numbers to deck letters
 deck_dict={'A':0, 'B':1, 'C':2, 'D':3, 'E':4, 'F':5, 'G':6, 'T':7}
+
+# Two arrays: one for decks one for room numbers
 decks=[]
 numbers=[]
 for i, entry in enumerate(cabinData):
@@ -183,9 +180,11 @@ for i, entry in enumerate(cabinData):
             decks.append(ds)
             numbers.append(ns)
 
+# Create new dataframe: one column for decks, one for room numbers
 d={'Decks':decks, 'Numbers': numbers}
 cabins_df = pd.DataFrame(d)
 
+# Save to csv
 csvName='cabins_cleaned.csv'
 filePath = '..//data//titanic_cleaned//' + csvName
 fileDir = os.path.dirname(os.path.realpath('__file__'))
