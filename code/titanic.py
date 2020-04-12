@@ -139,3 +139,11 @@ plotPath = os.path.abspath(os.path.realpath(plotPath))
 plotName = 'GenderSurvivalBarChart.png'
 plt.savefig(os.path.join(plotPath, plotName), bbox_inches='tight')
 plt.show()
+
+
+ageData = df['Age']
+x=[]
+y=[]
+for i, entry in enumerate(ageData):
+    if isinstance(entry, int):
+        x.app
