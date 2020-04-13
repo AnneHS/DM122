@@ -15,6 +15,8 @@ train_cleaned
 - Sex: female:1, male:0
 - Age: float
 - Agegroup (age): child:0, teenager:1, young adult:2, adult:3, senior:4
+- Fare: float
+- FareGrouped:  fares grouped into 4 quartiles (0, 1, 2, 3)
 - Deck (cabin): A:0, B:1, C:2, ..., G:6, T:7
 - Number (cabin): int
 - Side (cabin): starboard:1, port side:2
@@ -28,6 +30,8 @@ test_cleaned
 - Sex: female:1, male:0
 - Age: float
 - Agegroup (age): child:0, teenager:1, young adult:2, adult:3, senior:4
+- Fare: float
+- FareGrouped:  fares grouped into 4 quartiles (0, 1, 2, 3)
 - Deck (cabin): A:0, B:1, C:2, ..., G:6, T:7
 - Number (cabin): int
 - Side (cabin): starboard:1, port side:2
@@ -197,7 +201,10 @@ for x in range(len(fareTestData)):
      if pd.isnull(fareTestData[x]):
         pclass = testdf["Pclass"][x]
         fareTestData[x] = round(fareData[df["Pclass"] == pclass].mean(), 4)
-print(fareTestData)
+
+# CATEGORIZE FARE
+fareGrouped = pd.qcut(fareData, 4, labels = [0, 1, 2, 3])
+fareTestGrouped = pd.qcut(fareTestData, 4, labels = [0, 1, 2, 3])
 
 ###############################################################################
 # CABIN: DECK, NUMBER, SIDE
@@ -367,7 +374,7 @@ embarkedTest=embarkedTest.fillna(-1)
 # TRAINING SET
 # New Dataframe
 d={'Survived': df['Survived'], 'Pclass': df['Pclass'], 'Sex': sex, 'Age': age,
-    'AgeGroup': ageGroup, 'Fare': fareData, 'Deck':decks, 'Number': numbers, 'Side': sides,
+    'AgeGroup': ageGroup, 'Fare': fareData, 'FareGrouped': fareGrouped,'Deck':decks, 'Number': numbers, 'Side': sides,
     'Embarked': embarked, 'Title': title}
 cleaned_df = pd.DataFrame(d)
 cleaned_df.index.name='PassengerId'
@@ -383,7 +390,7 @@ cleaned_df.to_csv(csvPath)
 # TESTING SET
 # New DataFrame
 dTest={'Sex': sexTest, 'Age': ageTest, 'AgeGroup': ageGroupTest, 'Fare': fareTestData,
-     'Deck': decksTest, 'Number': numbersTest,
+     'FareGrouped': fareTestGrouped,'Deck': decksTest, 'Number': numbersTest,
     'Side': sidesTest, 'Embarked': embarkedTest, 'Title': titleTest}
 cleaned_test=pd.DataFrame(dTest)
 cleaned_test.index.name='PassengerId'
