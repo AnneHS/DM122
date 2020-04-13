@@ -32,6 +32,197 @@ csvPath = os.path.abspath(os.path.realpath(csvPath))
 # read data
 df = pd.read_csv(csvPath, sep=',', engine='python')
 
+
+###############################################################################
+# SEX
+###############################################################################
+
+sexData=df['Sex']
+sex=[]
+sex_dict={'male':0, 'female':1}
+for entry in sexData:
+    sex.append(sex_dict[entry])
+
+
+
+###############################################################################
+# Title
+###############################################################################
+
+#TODO: Replace various titles with Dr, Mr, Mrs (NEED TO COMBINE WITH TEST DATA FIRST)
+
+
+###############################################################################
+# AGE
+###############################################################################
+
+ageData = df['Age']
+unique=[]
+
+# Get row indices of missing entries
+loc = np.where(pd.isnull(ageData))
+unknown_index=loc[0]
+
+age=[]
+ageGroup=[]
+for i, entry in enumerate(ageData):
+    if i in unknown_index:
+        age.append(-1)
+        ageGroup.append(-1)
+    else:
+        age.append(entry)
+
+        if entry < 14:
+            ageGroup.append(0)  # Child
+        elif entry < 25:
+            ageGroup.append(1)  # Teenager
+        elif entry < 35:
+            ageGroup.append(2)  # Young adult
+        elif entry < 60:
+            ageGroup.append(3)  # Adult
+        else:
+            ageGroup.append(4)  # Senior
+
+
+
+###############################################################################
+# FARE
+###############################################################################
+
+#TODO: Replace missing ticket fares with average for their passenger class
+
+###############################################################################
+# CABIN
+##############################################################################
+
+# Get cabin data
+cabinData = df['Cabin']
+
+# Get row indices of missing entries
+loc = np.where(pd.isnull(cabinData))
+rows=loc[0]
+
+# Assign numbers to deck letters
+deck_dict={'A':0, 'B':1, 'C':2, 'D':3, 'E':4, 'F':5, 'G':6, 'T':7}
+
+# port side = left(even) strictly enforced
+# starboard = right (uneven) not strictly enforced
+
+# Three arrays: decks, room number, side (starboard/port side)
+decks=[]
+numbers=[]
+sides=[]
+for i, entry in enumerate(cabinData):
+    if i in rows:
+        decks.append(-1)
+        numbers.append(-1)
+        sides.append(-1)
+    else:
+        cabins = entry.split()
+
+        # One cabin
+        if len(cabins)==1:
+
+            # Get deck (A, B, C,...)
+            d=deck_dict[cabins[0][0]]
+            decks.append(d)
+
+            # If cabin number known
+            if len(cabins[0])>1:
+
+                # Get number
+                numbers.append(cabins[0][1:])
+
+                # Get side:  starboard (uneven), port side (even)
+                if int(cabins[0][-1])%2 ==0:
+                    sides.append(2)
+                else:
+                    sides.append(1)
+
+            else:
+                numbers.append(-1)
+                sides.append(-1)
+        else:
+            ds=[]
+            ns=[]
+            s=[]
+            for cabin in cabins:
+
+                # Get deck (A, B, C...)
+                ds.append(deck_dict[cabin[0]])
+
+                # if number known
+                if len(cabin)>1:
+                    ns.append(int(cabin[1:]))
+
+                    # Get side: port side (even), starboard (uneven)
+                    if int(cabin[-1])%2==0:
+                        s.append(2)
+                    else:
+                        s.append(1)
+                else:
+                    ns.append(-1)
+
+            decks.append(ds)
+            numbers.append(ns)
+            sides.append(s)
+
+
+
+
+
+##############################################################################
+# EMBARKED
+##############################################################################
+embarkedData = df['Embarked']
+
+unique=[]
+for entry in embarkedData:
+
+    if entry not in unique:
+        unique.append(entry)
+
+# Get row indices of missing entries
+loc = np.where(pd.isnull(embarkedData))
+unknown_index=loc[0]
+
+# Number categories
+embarked=[]
+embarkedDict={'C':1, 'Q': 2, 'S': 3}
+for i, entry in enumerate(embarkedData):
+
+    # Unknown => -1
+    if i in unknown_index:
+        embarked.append(-1)
+    else:
+        embarked.append(embarkedDict[entry])
+print(embarked)
+
+
+
+###############################################################################
+# CLEANED => DATAFRAME => CSV
+##############################################################################
+# New Dataframe
+d={'Survived': df['Survived'], 'Pclass': df['Pclass'], 'Sex': sex, 'Age': age,
+    'AgeGroup': ageGroup, 'Deck':decks, 'Number': numbers, 'Side': sides,
+    'Embarked': embarked}
+cleaned_df = pd.DataFrame(d)
+cleaned_df.index.name='PassengerId'
+
+# Save to csv
+csvName='titanic_cleaned.csv'
+filePath = '..//data//titanic_cleaned//' + csvName
+fileDir = os.path.dirname(os.path.realpath('__file__'))
+csvPath = os.path.join(fileDir, filePath)
+csvPath = os.path.abspath(os.path.realpath(csvPath))
+cleaned_df.to_csv(csvPath)
+
+
+
+###############################################################################
+# BAR CHARTS
+###############################################################################
 '''
 # Get passenger total, total deaths, total survived
 survivalData = df['Survived']
@@ -159,186 +350,3 @@ plt.savefig(os.path.join(plotPath, plotName), bbox_inches='tight')
 plt.show()
 
 '''
-###############################################################################
-# SEX
-###############################################################################
-
-sexData=df['Sex']
-sex=[]
-sex_dict={'male':0, 'female':1}
-for entry in sexData:
-    sex.append(sex_dict[entry])
-
-
-
-###############################################################################
-# Title
-###############################################################################
-
-#TODO: Replace various titles with Dr, Mr, Mrs (NEED TO COMBINE WITH TEST DATA FIRST)
-
-
-###############################################################################
-# AGE
-###############################################################################
-
-ageData = df['Age']
-unique=[]
-
-# Get row indices of missing entries
-loc = np.where(pd.isnull(ageData))
-unknown_index=loc[0]
-
-age=[]
-ageGroup=[]
-for i, entry in enumerate(ageData):
-    if i in unknown_index:
-        age.append(-1)
-        ageGroup.append(-1)
-    else:
-        age.append(entry)
-
-        if entry < 14:
-            ageGroup.append(0)  # Child
-        elif entry < 25:
-            ageGroup.append(1)  # Teenager
-        elif entry < 35:
-            ageGroup.append(2)  # Young adult
-        elif entry < 60:
-            ageGroup.append(3)  # Adult
-        else:
-            ageGroup.append(4)  # Senior
-
-
-
-###############################################################################
-# FARE
-###############################################################################
-
-
-
-###############################################################################
-# CABIN
-##############################################################################
-
-# Get cabin data
-cabinData = df['Cabin']
-
-# Get row indices of missing entries
-loc = np.where(pd.isnull(cabinData))
-rows=loc[0]
-
-# Assign numbers to deck letters
-deck_dict={'A':0, 'B':1, 'C':2, 'D':3, 'E':4, 'F':5, 'G':6, 'T':7}
-
-# port side = left(even) strictly enforced
-# starboard = right (uneven) not strictly enforced
-
-# Three arrays: decks, room number, side (starboard/port side)
-decks=[]
-numbers=[]
-sides=[]
-for i, entry in enumerate(cabinData):
-    if i in rows:
-        decks.append(-1)
-        numbers.append(-1)
-        sides.append(-1)
-    else:
-        cabins = entry.split()
-
-        # One cabin
-        if len(cabins)==1:
-
-            # Get deck (A, B, C,...)
-            d=deck_dict[cabins[0][0]]
-            decks.append(d)
-
-            # If cabin number known
-            if len(cabins[0])>1:
-
-                # Get number
-                numbers.append(cabins[0][1:])
-
-                # Get side:  starboard (uneven), port side (even)
-                if int(cabins[0][-1])%2 ==0:
-                    sides.append(2)
-                else:
-                    sides.append(1)
-
-            else:
-                numbers.append(-1)
-                sides.append(-1)
-        else:
-            ds=[]
-            ns=[]
-            s=[]
-            for cabin in cabins:
-
-                # Get deck (A, B, C...)
-                ds.append(deck_dict[cabin[0]])
-
-                # if number known
-                if len(cabin)>1:
-                    ns.append(int(cabin[1:]))
-
-                    # Get side: port side (even), starboard (uneven)
-                    if int(cabin[-1])%2==0:
-                        s.append(2)
-                    else:
-                        s.append(1)
-                else:
-                    ns.append(-1)
-
-            decks.append(ds)
-            numbers.append(ns)
-            sides.append(s)
-
-
-
-
-
-##############################################################################
-# EMBARKED
-##############################################################################
-embarkedData = df['Embarked']
-
-unique=[]
-for entry in embarkedData:
-
-    if entry not in unique:
-        unique.append(entry)
-
-# Get row indices of missing entries
-loc = np.where(pd.isnull(embarkedData))
-unknown_index=loc[0]
-
-# Number categories
-embarked=[]
-embarkedDict={'C':1, 'Q': 2, 'S': 3}
-for i, entry in enumerate(embarkedData):
-
-    # Unknown => -1
-    if i in unknown_index:
-        embarked.append(-1)
-    else:
-        embarked.append(embarkedDict[entry])
-print(embarked)
-
-
-###############################################################################
-# CLEANED => DATAFRAME => CSV
-##############################################################################
-# New Dataframe
-d={'Survived': df['Survived'], 'Pclass': df['Pclass'], 'Sex': sex, 'Age': age,
-    'AgeGroup': ageGroup, 'Deck':decks, 'Number': numbers, 'Side': sides,
-    'Embarked': embarked}
-cleaned_df = pd.DataFrame(d)
-cleaned_df.index.name='PassengerId'
-
-# Save to csv
-csvName='titanic_cleaned.csv'
-filePath = '..//data//titanic_cleaned//' + csvName
-fileDir = os.path.dirname(os.path.realpath('__file__'))
-csvPath = os.path.join(fileDir, filePath)
-csvPath = os.path.abspath(os.path.realpath(csvPath))
-cleaned_df.to_csv(csvPath)
