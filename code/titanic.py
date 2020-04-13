@@ -143,6 +143,8 @@ plt.savefig(os.path.join(plotPath, plotName), bbox_inches='tight')
 plt.show()
 
 '''
+###############################################################################
+# CABIN DATA
 
 # Get cabin data
 cabinData = df['Cabin']
@@ -154,34 +156,69 @@ rows=loc[0]
 # Assign numbers to deck letters
 deck_dict={'A':0, 'B':1, 'C':2, 'D':3, 'E':4, 'F':5, 'G':6, 'T':7}
 
-# Two arrays: one for decks one for room numbers
+# port side = left(even) strictly enforced
+# starboard = right (uneven) not strictly enforced
+# Three arrays: decks, room number, side (starboard/port side)
 decks=[]
 numbers=[]
+sides=[]
 for i, entry in enumerate(cabinData):
     if i in rows:
         decks.append(-1)
         numbers.append(-1)
+        sides.append(-1)
     else:
         cabins = entry.split()
+
+        # One cabin
         if len(cabins)==1:
+
+            # Get deck (A, B, C,...)
             d=deck_dict[cabins[0][0]]
             decks.append(d)
-            numbers.append(cabins[0][1:])
+
+            # If cabin number known
+            if len(cabins[0])>1:
+
+                # Get number
+                numbers.append(cabins[0][1:])
+
+                # Get side:  starboard (uneven), port side (even)
+                if int(cabins[0][-1])%2 ==0:
+                    sides.append(2)
+                else:
+                    sides.append(1)
+
+            else:
+                numbers.append(-1)
+                sides.append(-1)
         else:
             ds=[]
             ns=[]
+            s=[]
             for cabin in cabins:
-                if cabin[1:]=='':
-                    n=-1
-                else:
-                    n=int(cabin[1:])
+
+                # Get deck (A, B, C...)
                 ds.append(deck_dict[cabin[0]])
-                ns.append(n)
+
+                # if number known
+                if len(cabin)>1:
+                    ns.append(int(cabin[1:]))
+
+                    # Get side: port side (even), starboard (uneven)
+                    if int(cabin[-1])%2==0:
+                        s.append(2)
+                    else:
+                        s.append(1)
+                else:
+                    ns.append(-1)
+
             decks.append(ds)
             numbers.append(ns)
+            sides.append(s)
 
 # Create new dataframe: one column for decks, one for room numbers
-d={'Decks':decks, 'Numbers': numbers}
+d={'Deck':decks, 'Number': numbers, 'Side': sides}
 cabins_df = pd.DataFrame(d)
 
 # Save to csv
