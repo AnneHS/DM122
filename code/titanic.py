@@ -59,18 +59,13 @@ testdf = pd.read_csv(csvPath, sep=',', engine='python')
 
 # TRAIN DATA
 sexData=df['Sex']
-sex=[]
-sex_dict={'male':0, 'female':1}
-for entry in sexData:
-    sex.append(sex_dict[entry])
+sex_mapping={'male':0, 'female':1}
+sex=sexData.map(sex_mapping)
+
 
 # TEST DATA
-sexData=testdf['Sex']
-sexTest=[]
-for entry in sexData:
-    sexTest.append(sex_dict[entry])
-
-
+sexTestData=testdf['Sex']
+sexTest=sexTestData.map(sex_mapping)
 
 ###############################################################################
 # TITLE
@@ -176,7 +171,7 @@ for i, entry in enumerate(ageTestData):
 
 
 ###############################################################################
-# CABIN
+# CABIN: DECK, NUMBER, SIDE
 ##############################################################################
 
 #TRAIN DATA
@@ -323,30 +318,17 @@ for i, entry in enumerate(cabinTestData):
 ##############################################################################
 # EMBARKED
 ##############################################################################
+
+# TRAIN
 embarkedData = df['Embarked']
+embarked_mapping={'C':1, 'Q': 2, 'S': 3}
+embarked=embarkedData.map(embarked_mapping)
+embarked=embarkedData.fillna(-1)
 
-unique=[]
-for entry in embarkedData:
-
-    if entry not in unique:
-        unique.append(entry)
-
-# Get row indices of missing entries
-loc = np.where(pd.isnull(embarkedData))
-unknown_index=loc[0]
-
-# Number categories
-embarked=[]
-embarkedDict={'C':1, 'Q': 2, 'S': 3}
-for i, entry in enumerate(embarkedData):
-
-    # Unknown => -1
-    if i in unknown_index:
-        embarked.append(-1)
-    else:
-        embarked.append(embarkedDict[entry])
-print(embarked)
-
+# TEST
+embarkedTestData = testdf['Embarked']
+embarkedTest=embarkedTestData.map(embarked_mapping)
+embarkedTest=embarkedTest.fillna(-1)
 
 
 ###############################################################################
@@ -372,7 +354,8 @@ cleaned_df.to_csv(csvPath)
 # TESTING SET
 # New DataFrame
 dTest={'Sex': sexTest, 'Age': ageTest, 'AgeGroup': ageGroupTest,
-    'Title': titleTest, 'Deck': decksTest, 'Number': numbersTest, 'Side': sidesTest}
+     'Deck': decksTest, 'Number': numbersTest,
+    'Side': sidesTest, 'Embarked': embarkedTest, 'Title': titleTest}
 cleaned_test=pd.DataFrame(dTest)
 cleaned_test.index.name='PassengerId'
 
