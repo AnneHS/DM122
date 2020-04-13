@@ -5,6 +5,22 @@ import numpy as np
 import re
 import math
 
+'''
+Creates new cleaned dataset
+- PassengerId: int
+- Survived: yes:1, no:0
+- Pclass: first:1, middle:2, lower:3
+- Sex: female:1, male:0
+- Age: float
+- Agegroup (age): child:0, teenager:1, young adult:2, adult:3, senior:4
+- Deck (cabin): A:0, B:1, C:2, ..., G:6, T:7
+- Number (cabin): int
+- Side (cabin): starboard:1, port side:2
+- Embarked: Cherbourg:1, Queenstown:2, Southampton:3
+
+* all unknowns set to -1
+'''
+
 fileName='train.csv'
 filePath = '..//data//titanic//' + fileName
 
@@ -144,7 +160,66 @@ plt.show()
 
 '''
 ###############################################################################
-# CABIN DATA
+# SEX
+###############################################################################
+
+sexData=df['Sex']
+sex=[]
+sex_dict={'male':0, 'female':1}
+for entry in sexData:
+    sex.append(sex_dict[entry])
+
+
+
+###############################################################################
+# Title
+###############################################################################
+
+#TODO: Replace various titles with Dr, Mr, Mrs (NEED TO COMBINE WITH TEST DATA FIRST)
+
+
+###############################################################################
+# AGE
+###############################################################################
+
+ageData = df['Age']
+unique=[]
+
+# Get row indices of missing entries
+loc = np.where(pd.isnull(ageData))
+unknown_index=loc[0]
+
+age=[]
+ageGroup=[]
+for i, entry in enumerate(ageData):
+    if i in unknown_index:
+        age.append(-1)
+        ageGroup.append(-1)
+    else:
+        age.append(entry)
+
+        if entry < 14:
+            ageGroup.append(0)  # Child
+        elif entry < 25:
+            ageGroup.append(1)  # Teenager
+        elif entry < 35:
+            ageGroup.append(2)  # Young adult
+        elif entry < 60:
+            ageGroup.append(3)  # Adult
+        else:
+            ageGroup.append(4)  # Senior
+
+
+
+###############################################################################
+# FARE
+###############################################################################
+
+
+
+###############################################################################
+# CABIN
+##############################################################################
 
 # Get cabin data
 cabinData = df['Cabin']
@@ -158,6 +233,7 @@ deck_dict={'A':0, 'B':1, 'C':2, 'D':3, 'E':4, 'F':5, 'G':6, 'T':7}
 
 # port side = left(even) strictly enforced
 # starboard = right (uneven) not strictly enforced
+
 # Three arrays: decks, room number, side (starboard/port side)
 decks=[]
 numbers=[]
@@ -217,14 +293,52 @@ for i, entry in enumerate(cabinData):
             numbers.append(ns)
             sides.append(s)
 
-# Create new dataframe: one column for decks, one for room numbers
-d={'Deck':decks, 'Number': numbers, 'Side': sides}
-cabins_df = pd.DataFrame(d)
+
+
+
+
+##############################################################################
+# EMBARKED
+##############################################################################
+embarkedData = df['Embarked']
+
+unique=[]
+for entry in embarkedData:
+
+    if entry not in unique:
+        unique.append(entry)
+
+# Get row indices of missing entries
+loc = np.where(pd.isnull(embarkedData))
+unknown_index=loc[0]
+
+# Number categories
+embarked=[]
+embarkedDict={'C':1, 'Q': 2, 'S': 3}
+for i, entry in enumerate(embarkedData):
+
+    # Unknown => -1
+    if i in unknown_index:
+        embarked.append(-1)
+    else:
+        embarked.append(embarkedDict[entry])
+print(embarked)
+
+
+###############################################################################
+# CLEANED => DATAFRAME => CSV
+##############################################################################
+# New Dataframe
+d={'Survived': df['Survived'], 'Pclass': df['Pclass'], 'Sex': sex, 'Age': age,
+    'AgeGroup': ageGroup, 'Deck':decks, 'Number': numbers, 'Side': sides,
+    'Embarked': embarked}
+cleaned_df = pd.DataFrame(d)
+cleaned_df.index.name='PassengerId'
 
 # Save to csv
-csvName='cabins_cleaned.csv'
+csvName='titanic_cleaned.csv'
 filePath = '..//data//titanic_cleaned//' + csvName
 fileDir = os.path.dirname(os.path.realpath('__file__'))
 csvPath = os.path.join(fileDir, filePath)
 csvPath = os.path.abspath(os.path.realpath(csvPath))
-cabins_df.to_csv(csvPath)
+cleaned_df.to_csv(csvPath)
