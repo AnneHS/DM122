@@ -6,7 +6,7 @@ import re
 import math
 
 '''
-Creates new cleaned dataset
+Creates new cleaned training dataset
 - PassengerId: int
 - Survived: yes:1, no:0
 - Pclass: first:1, middle:2, lower:3
@@ -20,7 +20,11 @@ Creates new cleaned dataset
 
 * all unknowns set to -1
 '''
+###############################################################################
+# DATA
+###############################################################################
 
+# TRAIN DATA
 fileName='train.csv'
 filePath = '..//data//titanic//' + fileName
 
@@ -33,31 +37,80 @@ csvPath = os.path.abspath(os.path.realpath(csvPath))
 df = pd.read_csv(csvPath, sep=',', engine='python')
 
 
+
+# TEST DATA
+fileName='test.csv'
+filePath = '..//data//titanic//' + fileName
+
+# get path
+fileDir = os.path.dirname(os.path.realpath('__file__'))
+csvPath = os.path.join(fileDir, filePath)
+csvPath = os.path.abspath(os.path.realpath(csvPath))
+
+# read data
+testdf = pd.read_csv(csvPath, sep=',', engine='python')
+
+
+
+
 ###############################################################################
 # SEX
 ###############################################################################
 
+# TRAIN DATA
 sexData=df['Sex']
 sex=[]
 sex_dict={'male':0, 'female':1}
 for entry in sexData:
     sex.append(sex_dict[entry])
 
+# TEST DATA
+sexData=testdf['Sex']
+sexTest=[]
+for entry in sexData:
+    sexTest.append(sex_dict[entry])
+
 
 
 ###############################################################################
-# Title
+# TITLE
 ###############################################################################
 
-#TODO: Replace various titles with Dr, Mr, Mrs (NEED TO COMBINE WITH TEST DATA FIRST)
+# TRAIN DATA
+dataName=df['Name']
+
+# Replace various titles with more common title
+title=dataName.str.extract(' ([A-Za-z]+)\.', expand=False)
+title=title.replace(['Mlle','Ms','Countess','Miss','Mme'], 'Mrs')
+title=title.replace(['Major','Sir','Capt','Col','Don','Jonkheer','Rev','Master','Lady'], 'Mr')
+
+# Mapping
+title_mapping={'Dr':0, 'Mr':1, 'Mrs':2}
+title=title.map(title_mapping)
+title=title.fillna(-1)
+
+
+
+# TEST DATA
+testName=testdf['Name']
+
+# Replace various titles with more common title
+titleTest=testName.str.extract(' ([A-Za-z]+)\.', expand=False)
+titleTest=titleTest.replace(['Mlle','Ms','Countess','Miss','Mme'], 'Mrs')
+titleTest=titleTest.replace(['Major','Sir','Capt','Col','Don','Jonkheer','Rev','Master','Lady'], 'Mr')
+
+# Mapping
+titleTest=titleTest.map(title_mapping)
+titleTest=titleTest.fillna(-1)
+
 
 
 ###############################################################################
 # AGE
 ###############################################################################
 
+# TRAIN DATA
 ageData = df['Age']
-unique=[]
 
 # Get row indices of missing entries
 loc = np.where(pd.isnull(ageData))
@@ -84,6 +137,35 @@ for i, entry in enumerate(ageData):
             ageGroup.append(4)  # Senior
 
 
+# TEST DATA
+ageTestData = testdf['Age']
+
+# Get row indices of missing entries
+loc = np.where(pd.isnull(ageTestData))
+unknown_index=loc[0]
+
+ageTest=[]
+ageGroupTest=[]
+for i, entry in enumerate(ageTestData):
+    if i in unknown_index:
+        ageTest.append(-1)
+        ageGroupTest.append(-1)
+    else:
+        ageTest.append(entry)
+
+        if entry < 14:
+            ageGroupTest.append(0)  # Child
+        elif entry < 25:
+            ageGroupTest.append(1)  # Teenager
+        elif entry < 35:
+            ageGroupTest.append(2)  # Young adult
+        elif entry < 60:
+            ageGroupTest.append(3)  # Adult
+        else:
+            ageGroupTest.append(4)  # Senior
+
+
+
 
 ###############################################################################
 # FARE
@@ -97,6 +179,7 @@ for i, entry in enumerate(ageData):
 # CABIN
 ##############################################################################
 
+#TRAIN DATA
 # Get cabin data
 cabinData = df['Cabin']
 
@@ -170,8 +253,72 @@ for i, entry in enumerate(cabinData):
             sides.append(s)
 
 
+#TEST DATA
+# Get cabin data
+cabinTestData = testdf['Cabin']
 
+# Get row indices of missing entries
+loc = np.where(pd.isnull(cabinTestData))
+rows=loc[0]
 
+# Three arrays: decks, room number, side (starboard/port side)
+decksTest=[]
+numbersTest=[]
+sidesTest=[]
+for i, entry in enumerate(cabinTestData):
+    if i in rows:
+        decksTest.append(-1)
+        numbersTest.append(-1)
+        sidesTest.append(-1)
+    else:
+        cabins = entry.split()
+
+        # One cabin
+        if len(cabins)==1:
+
+            # Get deck (A, B, C,...)
+            d=deck_dict[cabins[0][0]]
+            decksTest.append(d)
+
+            # If cabin number known
+            if len(cabins[0])>1:
+
+                # Get number
+                numbersTest.append(cabins[0][1:])
+
+                # Get side:  starboard (uneven), port side (even)
+                if int(cabins[0][-1])%2 ==0:
+                    sidesTest.append(2)
+                else:
+                    sidesTest.append(1)
+
+            else:
+                numbersTest.append(-1)
+                sidesTest.append(-1)
+        else:
+            ds=[]
+            ns=[]
+            s=[]
+            for cabin in cabins:
+
+                # Get deck (A, B, C...)
+                ds.append(deck_dict[cabin[0]])
+
+                # if number known
+                if len(cabin)>1:
+                    ns.append(int(cabin[1:]))
+
+                    # Get side: port side (even), starboard (uneven)
+                    if int(cabin[-1])%2==0:
+                        s.append(2)
+                    else:
+                        s.append(1)
+                else:
+                    ns.append(-1)
+
+            decksTest.append(ds)
+            numbersTest.append(ns)
+            sidesTest.append(s)
 
 ##############################################################################
 # EMBARKED
@@ -205,22 +352,36 @@ print(embarked)
 ###############################################################################
 # CLEANED => DATAFRAME => CSV
 ##############################################################################
+
+# TRAINING SET
 # New Dataframe
 d={'Survived': df['Survived'], 'Pclass': df['Pclass'], 'Sex': sex, 'Age': age,
     'AgeGroup': ageGroup, 'Deck':decks, 'Number': numbers, 'Side': sides,
-    'Embarked': embarked}
+    'Embarked': embarked, 'Title': title}
 cleaned_df = pd.DataFrame(d)
 cleaned_df.index.name='PassengerId'
 
 # Save to csv
-csvName='titanic_cleaned.csv'
+csvName='train_cleaned.csv'
 filePath = '..//data//titanic_cleaned//' + csvName
 fileDir = os.path.dirname(os.path.realpath('__file__'))
 csvPath = os.path.join(fileDir, filePath)
 csvPath = os.path.abspath(os.path.realpath(csvPath))
 cleaned_df.to_csv(csvPath)
 
+# TESTING SET
+# New DataFrame
+dTest={'Sex': sexTest, 'Age': ageTest, 'AgeGroup': ageGroupTest,
+    'Title': titleTest, 'Deck': decksTest, 'Number': numbersTest, 'Side': sidesTest}
+cleaned_test=pd.DataFrame(dTest)
+cleaned_test.index.name='PassengerId'
 
+# Save to csv
+csvName='test_cleaned.csv'
+filePath = '..//data//titanic_cleaned//' + csvName
+csvPath = os.path.join(fileDir, filePath)
+csvPath = os.path.abspath(os.path.realpath(csvPath))
+cleaned_test.to_csv(csvPath)
 
 ###############################################################################
 # BAR CHARTS
