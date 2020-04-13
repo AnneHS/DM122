@@ -6,9 +6,24 @@ import re
 import math
 
 '''
-Creates new cleaned training dataset
+Creates new cleaned training datasets
+
+train_cleaned
 - PassengerId: int
 - Survived: yes:1, no:0
+- Pclass: first:1, middle:2, lower:3
+- Sex: female:1, male:0
+- Age: float
+- Agegroup (age): child:0, teenager:1, young adult:2, adult:3, senior:4
+- Deck (cabin): A:0, B:1, C:2, ..., G:6, T:7
+- Number (cabin): int
+- Side (cabin): starboard:1, port side:2
+- Embarked: Cherbourg:1, Queenstown:2, Southampton:3
+
+* all unknowns set to -1
+
+test_cleaned
+- PassengerId: int
 - Pclass: first:1, middle:2, lower:3
 - Sex: female:1, male:0
 - Age: float
@@ -66,6 +81,8 @@ sex=sexData.map(sex_mapping)
 # TEST DATA
 sexTestData=testdf['Sex']
 sexTest=sexTestData.map(sex_mapping)
+
+
 
 ###############################################################################
 # TITLE
@@ -166,9 +183,21 @@ for i, entry in enumerate(ageTestData):
 # FARE
 ###############################################################################
 
-#TODO: Replace missing ticket fares with average for their passenger class
+# TRAIN (has no missing entries)
+fareData = df['Fare']
+'''
+loc = np.where(pd.isnull(fareData))
+rows=loc[0]
+print(rows)
+'''
 
-
+# TEST:  Replace missing ticket fares with average for their passenger class
+fareTestData = testdf['Fare']
+for x in range(len(fareTestData)):
+     if pd.isnull(fareTestData[x]):
+        pclass = testdf["Pclass"][x]
+        fareTestData[x] = round(fareData[df["Pclass"] == pclass].mean(), 4)
+print(fareTestData)
 
 ###############################################################################
 # CABIN: DECK, NUMBER, SIDE
@@ -338,7 +367,7 @@ embarkedTest=embarkedTest.fillna(-1)
 # TRAINING SET
 # New Dataframe
 d={'Survived': df['Survived'], 'Pclass': df['Pclass'], 'Sex': sex, 'Age': age,
-    'AgeGroup': ageGroup, 'Deck':decks, 'Number': numbers, 'Side': sides,
+    'AgeGroup': ageGroup, 'Fare': fareData, 'Deck':decks, 'Number': numbers, 'Side': sides,
     'Embarked': embarked, 'Title': title}
 cleaned_df = pd.DataFrame(d)
 cleaned_df.index.name='PassengerId'
@@ -353,7 +382,7 @@ cleaned_df.to_csv(csvPath)
 
 # TESTING SET
 # New DataFrame
-dTest={'Sex': sexTest, 'Age': ageTest, 'AgeGroup': ageGroupTest,
+dTest={'Sex': sexTest, 'Age': ageTest, 'AgeGroup': ageGroupTest, 'Fare': fareTestData,
      'Deck': decksTest, 'Number': numbersTest,
     'Side': sidesTest, 'Embarked': embarkedTest, 'Title': titleTest}
 cleaned_test=pd.DataFrame(dTest)
