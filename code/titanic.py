@@ -59,7 +59,6 @@ csvPath = os.path.abspath(os.path.realpath(csvPath))
 # read data
 testdf = pd.read_csv(csvPath, sep=',', engine='python')
 
-
 ###############################################################################
 # TITLE (from NAME)
 ###############################################################################
@@ -90,6 +89,22 @@ titleTest=titleTest.replace(['Major','Sir','Capt','Col','Don','Jonkheer','Rev','
 # Mapping
 titleTest=titleTest.map(title_mapping)
 titleTest=titleTest.fillna(-1)
+
+
+###############################################################################
+# SURNAME (FROM NAME)
+###############################################################################
+
+surnames=[]
+for entry in dataName:
+    LastFirst = entry.split(',')
+    surnames.append(LastFirst[0])
+
+surnamesTest=[]
+for entry in testName:
+    LastFirst = entry.split(',')
+    surnamesTest.append(LastFirst[0])
+
 
 
 
@@ -171,13 +186,14 @@ for i, entry in enumerate(ageTestData):
 
 
 ##############################################################################
-# TICKET => TktNum (& TktPre?)
+# TktNum FROM TICKET
 ##############################################################################
 
 # TRAIN
 ticketData = df['Ticket']
-TktPre=[]
+#TktPre=[]
 TktNum=[]
+unique=[]
 for entry in ticketData:
     PreNum=entry.split()
     if PreNum[-1]== 'LINE':
@@ -188,7 +204,7 @@ for entry in ticketData:
 
 #TEST
 ticketDataTest = testdf['Ticket']
-TktPreTest=[]
+#TktPreTest=[]
 TktNumTest=[]
 for entry in ticketDataTest:
     PreNum=entry.split()
@@ -196,6 +212,10 @@ for entry in ticketDataTest:
         TktNumTest.append(-1)
     else:
         TktNumTest.append(PreNum[-1])
+
+#TODO: TktPre???
+
+
 
 ###############################################################################
 # FARE
@@ -391,10 +411,10 @@ embarkedTest=embarkedTest.fillna(-1)
 # TRAINING SET
 # New Dataframe
 d={'Survived': df['Survived'], 'Pclass': df['Pclass'], 'Title': title,
-    'Sex': sex, 'Age': age, 'SibSp': df['SibSp'], 'Parch': df['Parch'],
-    'Fare': fareData, 'TktNum': TktNum, 'Embarked': embarked, 'Decks': decks,
-    'CabinNumber': numbers, 'Side': sides, 'AgeGroup': ageGroup,
-    'FareGrouped':fareGrouped}
+    'Surname': surnames,'Sex': sex, 'Age': age, 'SibSp': df['SibSp'],
+    'Parch': df['Parch'], 'Fare': fareData, 'TktNum': TktNum,
+    'Embarked': embarked, 'Deck': decks,'CabinNumber': numbers, 'Side': sides,
+    'AgeGroup': ageGroup,'FareGroup':fareGrouped}
 cleaned_df = pd.DataFrame(d)
 cleaned_df.index.name='PassengerId'
 
@@ -408,11 +428,11 @@ cleaned_df.to_csv(csvPath)
 
 # TESTING SET
 # New DataFrame
-dTest={'Pclass': testdf['Pclass'], 'Title': titleTest, 'Sex': sexTest,
-    'Age': ageTest, 'SubSp': testdf['SibSp'], 'Parch': testdf['Parch'],
-    'TktNum': TktNumTest, 'Fare': fareTestData, 'Embarked': embarkedTest,
-    'Deck': decksTest, 'CabinNumber': numbersTest, 'Side': sidesTest,
-    'AgeGroup': ageGroupTest, 'FareGrouped': fareTestGrouped}
+dTest={'Pclass': testdf['Pclass'], 'Title': titleTest, 'Surname':surnamesTest,
+    'Sex': sexTest,'Age': ageTest, 'SubSp': testdf['SibSp'],
+    'Parch': testdf['Parch'],'TktNum': TktNumTest, 'Fare': fareTestData,
+    'Embarked': embarkedTest,'Deck': decksTest, 'CabinNumber': numbersTest,
+    'Side': sidesTest,'AgeGroup': ageGroupTest, 'FareGroup': fareTestGrouped}
 cleaned_test=pd.DataFrame(dTest)
 cleaned_test.index.name='PassengerId'
 
