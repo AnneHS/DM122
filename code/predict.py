@@ -18,9 +18,9 @@ csvPath = os.path.abspath(os.path.realpath(csvPath))
 df = pd.read_csv(csvPath, sep=',', engine='python')
 
 y = df['Survived']
-x = df[['Pclass', 'Sex' , 'AgeGroup', 'TktNum', 'Parch','SibSp']]#,'Parch', 'SibSp', 'TktNum']]
+x = df[['Pclass', 'Sex' , 'AgeGroup', 'Parch','SibSp', 'TktNum', 'Embarked']]#,'Parch', 'SibSp', 'TktNum']]
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.33, random_state=42)
-x_train2, x_test2, y_train2, y_test2 = train_test_split(x, y, test_size=0.33, random_state=42)
+x_train2, x_test2, y_train2, y_test2 = train_test_split(x_train, y_train, test_size=0.33, random_state=42)
 
 x_test3=x_train2
 y_test3=y_train2

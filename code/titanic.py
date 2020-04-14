@@ -396,13 +396,14 @@ embarked_mapping={'C':1, 'Q': 2, 'S': 3}
 # TRAIN
 embarkedData = df['Embarked']
 embarked=embarkedData.map(embarked_mapping)
-embarked=embarkedData.fillna(-1)
+embarked=embarked.fillna(-1)
+#print(embarked)
 
 # TEST
 embarkedTestData = testdf['Embarked']
 embarkedTest=embarkedTestData.map(embarked_mapping)
 embarkedTest=embarkedTest.fillna(-1)
-
+#print(embarkedTest)
 
 ###############################################################################
 # CLEANED => DATAFRAME => CSV
