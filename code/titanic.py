@@ -430,7 +430,7 @@ cleaned_df.to_csv(csvPath)
 # TESTING SET
 # New DataFrame
 dTest={'Pclass': testdf['Pclass'], 'Title': titleTest, 'Surname':surnamesTest,
-    'Sex': sexTest,'Age': ageTest, 'SubSp': testdf['SibSp'],
+    'Sex': sexTest,'Age': ageTest, 'SibSp': testdf['SibSp'],
     'Parch': testdf['Parch'],'TktNum': TktNumTest, 'Fare': fareTestData,
     'Embarked': embarkedTest,'Deck': decksTest, 'CabinNumber': numbersTest,
     'Side': sidesTest,'AgeGroup': ageGroupTest, 'FareGroup': fareTestGrouped}

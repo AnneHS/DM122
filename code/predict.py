@@ -18,9 +18,9 @@ csvPath = os.path.abspath(os.path.realpath(csvPath))
 df = pd.read_csv(csvPath, sep=',', engine='python')
 
 y = df['Survived']
-x = df[['Pclass', 'Sex' , 'AgeGroup', 'Parch','SibSp', 'TktNum', 'Embarked']]#,'Parch', 'SibSp', 'TktNum']]
+x = df[['Pclass', 'Sex' , 'AgeGroup', 'Parch','SibSp', 'TktNum']]# 'Embarked']]#,'Parch', 'SibSp', 'TktNum']]
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.33, random_state=42)
-x_train2, x_test2, y_train2, y_test2 = train_test_split(x_train, y_train, test_size=0.33, random_state=42)
+x_train2, x_test2, y_train2, y_test2 = train_test_split(x_train, y_train, test_size=0.5, random_state=42)
 
 x_test3=x_train2
 y_test3=y_train2
@@ -72,3 +72,39 @@ gbk.fit(x_test3, y_test3)
 predicted_y=gbk.predict(x_test3)
 accuracy= accuracy_score(y_test3, predicted_y)
 print ('GRADIENT BOOSTING: ' + str(accuracy))
+
+
+# TEST CLEANED
+fileName='test_cleaned.csv'
+filePath = '..//data//titanic_cleaned//' + fileName
+
+# get path
+fileDir = os.path.dirname(os.path.realpath('__file__'))
+csvPath = os.path.join(fileDir, filePath)
+csvPath = os.path.abspath(os.path.realpath(csvPath))
+df = pd.read_csv(csvPath, sep=',', engine='python')
+
+x = df[['Pclass', 'Sex' , 'AgeGroup', 'Parch','SibSp', 'TktNum']]# 'Embarked']]#,'Parch', 'SibSp', 'TktNum']]
+predicted_y=gbk.predict(x)
+
+
+# GET TEST UNCLEANED PassengerId INDEX
+fileName='test.csv'
+filePath = '..//data//titanic//' + fileName
+
+# get path
+fileDir = os.path.dirname(os.path.realpath('__file__'))
+csvPath = os.path.join(fileDir, filePath)
+csvPath = os.path.abspath(os.path.realpath(csvPath))
+test = pd.read_csv(csvPath, sep=',', engine='python')
+
+d={'Survived': predicted_y}
+prediction_df=pd.DataFrame(d, index=test['PassengerId'])
+prediction_df.index.name='PassengerId'
+
+# Save to csv
+csvName='first_prediction.csv'
+filePath = '..//data//predictions//' + csvName
+csvPath = os.path.join(fileDir, filePath)
+csvPath = os.path.abspath(os.path.realpath(csvPath))
+prediction_df.to_csv(csvPath)

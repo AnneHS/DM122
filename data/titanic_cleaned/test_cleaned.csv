@@ -1,4 +1,4 @@
-PassengerId,Pclass,Title,Surname,Sex,Age,SubSp,Parch,TktNum,Fare,Embarked,Deck,CabinNumber,Side,AgeGroup,FareGroup
+PassengerId,Pclass,Title,Surname,Sex,Age,SibSp,Parch,TktNum,Fare,Embarked,Deck,CabinNumber,Side,AgeGroup,FareGroup
 0,3,1.0,Kelly,0,34.5,0,0,330911,7.8292,2,-1,-1,-1,2,0
 1,3,2.0,Wilkes,1,47.0,1,0,363272,7.0,3,-1,-1,-1,3,0
 2,2,1.0,Myles,0,62.0,0,0,240276,9.6875,2,-1,-1,-1,4,1
