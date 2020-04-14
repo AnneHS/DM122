@@ -6,39 +6,29 @@ import re
 import math
 
 '''
-Creates new cleaned training datasets
-
-train_cleaned
+Cleans train.csv and test.csv => train_cleaned.csv, test_cleaned.csv
 - PassengerId: int
-- Survived: yes:1, no:0
-- Pclass: first:1, middle:2, lower:3
-- Sex: female:1, male:0
+- Survived*: no:0, yes:1
+- Pclass: first: 1, middle:2, lower:3
+- Title (Name): Dr:0, Mr:1, Mrs:2
+- Sex: male:0, female:1
 - Age: float
-- Agegroup (age): child:0, teenager:1, young adult:2, adult:3, senior:4
-- Fare: float
-- FareGrouped:  fares grouped into 4 quartiles (0, 1, 2, 3)
-- Deck (cabin): A:0, B:1, C:2, ..., G:6, T:7
-- Number (cabin): int
-- Side (cabin): starboard:1, port side:2
+- SibSp:  int (# of siblings/spoused aboard)
+- Parch: int (# of parents/children aboard)
+- Fare**: float (ticket price)
 - Embarked: Cherbourg:1, Queenstown:2, Southampton:3
+- Deck (Cabin): A:0, B:1, C:2, ..., G:6, T:7
+- CabinNumber (Cabin): int
+- Side (Cabin): starboard:1, port side:2
+- AgeGrouped: child:0, teenager:1, young adult:2, adult:3, senior:4
+- FareGrouped***: 1st:0, 2nd:1, 3rd:2, 4rd:3
+* Survived only for train_cleaned.csv
+** Uknown entries were replaced with average fare for Pclass
+*** Fares grouped into 4 quartiles (equally sized)
 
-* all unknowns set to -1
-
-test_cleaned
-- PassengerId: int
-- Pclass: first:1, middle:2, lower:3
-- Sex: female:1, male:0
-- Age: float
-- Agegroup (age): child:0, teenager:1, young adult:2, adult:3, senior:4
-- Fare: float
-- FareGrouped:  fares grouped into 4 quartiles (0, 1, 2, 3)
-- Deck (cabin): A:0, B:1, C:2, ..., G:6, T:7
-- Number (cabin): int
-- Side (cabin): starboard:1, port side:2
-- Embarked: Cherbourg:1, Queenstown:2, Southampton:3
-
-* all unknowns set to -1
+All unknowns are set to -1
 '''
+
 ###############################################################################
 # DATA
 ###############################################################################
@@ -70,26 +60,8 @@ csvPath = os.path.abspath(os.path.realpath(csvPath))
 testdf = pd.read_csv(csvPath, sep=',', engine='python')
 
 
-
-
 ###############################################################################
-# SEX
-###############################################################################
-
-# TRAIN DATA
-sexData=df['Sex']
-sex_mapping={'male':0, 'female':1}
-sex=sexData.map(sex_mapping)
-
-
-# TEST DATA
-sexTestData=testdf['Sex']
-sexTest=sexTestData.map(sex_mapping)
-
-
-
-###############################################################################
-# TITLE
+# TITLE (from NAME)
 ###############################################################################
 
 # TRAIN DATA
@@ -118,6 +90,22 @@ titleTest=titleTest.replace(['Major','Sir','Capt','Col','Don','Jonkheer','Rev','
 # Mapping
 titleTest=titleTest.map(title_mapping)
 titleTest=titleTest.fillna(-1)
+
+
+
+###############################################################################
+# SEX
+###############################################################################
+
+# TRAIN DATA
+sexData=df['Sex']
+sex_mapping={'male':0, 'female':1}
+sex=sexData.map(sex_mapping)
+
+
+# TEST DATA
+sexTestData=testdf['Sex']
+sexTest=sexTestData.map(sex_mapping)
 
 
 
@@ -182,6 +170,32 @@ for i, entry in enumerate(ageTestData):
 
 
 
+##############################################################################
+# TICKET => TktNum (& TktPre?)
+##############################################################################
+
+# TRAIN
+ticketData = df['Ticket']
+TktPre=[]
+TktNum=[]
+for entry in ticketData:
+    PreNum=entry.split()
+    if PreNum[-1]== 'LINE':
+        TktNum.append(-1)
+    else:
+        TktNum.append(PreNum[-1])
+
+
+#TEST
+ticketDataTest = testdf['Ticket']
+TktPreTest=[]
+TktNumTest=[]
+for entry in ticketDataTest:
+    PreNum=entry.split()
+    if PreNum[-1]== 'LINE':
+        TktNumTest.append(-1)
+    else:
+        TktNumTest.append(PreNum[-1])
 
 ###############################################################################
 # FARE
@@ -205,6 +219,8 @@ for x in range(len(fareTestData)):
 # CATEGORIZE FARE
 fareGrouped = pd.qcut(fareData, 4, labels = [0, 1, 2, 3])
 fareTestGrouped = pd.qcut(fareTestData, 4, labels = [0, 1, 2, 3])
+
+
 
 ###############################################################################
 # CABIN: DECK, NUMBER, SIDE
@@ -355,9 +371,10 @@ for i, entry in enumerate(cabinTestData):
 # EMBARKED
 ##############################################################################
 
+embarked_mapping={'C':1, 'Q': 2, 'S': 3}
+
 # TRAIN
 embarkedData = df['Embarked']
-embarked_mapping={'C':1, 'Q': 2, 'S': 3}
 embarked=embarkedData.map(embarked_mapping)
 embarked=embarkedData.fillna(-1)
 
@@ -373,9 +390,11 @@ embarkedTest=embarkedTest.fillna(-1)
 
 # TRAINING SET
 # New Dataframe
-d={'Survived': df['Survived'], 'Pclass': df['Pclass'], 'Sex': sex, 'Age': age,
-    'AgeGroup': ageGroup, 'Fare': fareData, 'FareGrouped': fareGrouped,'Deck':decks, 'Number': numbers, 'Side': sides,
-    'Embarked': embarked, 'Title': title}
+d={'Survived': df['Survived'], 'Pclass': df['Pclass'], 'Title': title,
+    'Sex': sex, 'Age': age, 'SibSp': df['SibSp'], 'Parch': df['Parch'],
+    'Fare': fareData, 'TktNum': TktNum, 'Embarked': embarked, 'Decks': decks,
+    'CabinNumber': numbers, 'Side': sides, 'AgeGroup': ageGroup,
+    'FareGrouped':fareGrouped}
 cleaned_df = pd.DataFrame(d)
 cleaned_df.index.name='PassengerId'
 
@@ -389,9 +408,11 @@ cleaned_df.to_csv(csvPath)
 
 # TESTING SET
 # New DataFrame
-dTest={'Sex': sexTest, 'Age': ageTest, 'AgeGroup': ageGroupTest, 'Fare': fareTestData,
-     'FareGrouped': fareTestGrouped,'Deck': decksTest, 'Number': numbersTest,
-    'Side': sidesTest, 'Embarked': embarkedTest, 'Title': titleTest}
+dTest={'Pclass': testdf['Pclass'], 'Title': titleTest, 'Sex': sexTest,
+    'Age': ageTest, 'SubSp': testdf['SibSp'], 'Parch': testdf['Parch'],
+    'TktNum': TktNumTest, 'Fare': fareTestData, 'Embarked': embarkedTest,
+    'Deck': decksTest, 'CabinNumber': numbersTest, 'Side': sidesTest,
+    'AgeGroup': ageGroupTest, 'FareGrouped': fareTestGrouped}
 cleaned_test=pd.DataFrame(dTest)
 cleaned_test.index.name='PassengerId'
 
