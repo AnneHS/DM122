@@ -118,12 +118,30 @@ for entry in testName:
 sexData=df['Sex']
 sex_mapping={'male':0, 'female':1}
 sex=sexData.map(sex_mapping)
-
+df['Sex']=sex
 
 # TEST DATA
 sexTestData=testdf['Sex']
 sexTest=sexTestData.map(sex_mapping)
 
+
+
+
+###############################################################################
+# AGE => Missing values
+###############################################################################
+
+df['Salutation']=df.Name.apply(lambda name: name.split(',')[1].split('.')[0].strip())
+grp=df.groupby(['Sex', 'Pclass'])
+df.Age=grp.Age.apply(lambda x: x.fillna(x.median()))
+df.Age.fillna(df.Age.median, inplace = True)
+#ageData = df.Age
+
+testdf['Salutation']=testdf.Name.apply(lambda name: name.split(',')[1].split('.')[0].strip())
+grp=testdf.groupby(['Sex', 'Pclass'])
+testdf.Age=grp.Age.apply(lambda x: x.fillna(x.median()))
+testdf.Age.fillna(testdf.Age.median, inplace = True)
+#ageData = df.Age
 
 
 ###############################################################################
@@ -191,6 +209,7 @@ for i, entry in enumerate(ageTestData):
             ageGroupTest.append(4)  # Senior
 
 
+
 ##############################################################################
 # FAMILY SIZE & ISALONE (PARCH & SIBSP)
 ##############################################################################
@@ -210,6 +229,8 @@ isAloneTest=[]
 famSizeTest=[]
 isAlone=(sibspData + parchData).apply(lambda x: 0 if x>0 else 1)
 famSize=sibspData+parchData+1
+
+
 
 ##############################################################################
 # TktNum FROM TICKET
@@ -413,6 +434,8 @@ for i, entry in enumerate(cabinTestData):
             numbersTest.append(ns)
             sidesTest.append(s)
 
+
+
 ##############################################################################
 # EMBARKED
 ##############################################################################
@@ -431,6 +454,8 @@ embarkedTest=embarkedTestData.map(embarked_mapping)
 embarkedTest=embarkedTest.fillna(-1)
 #print(embarkedTest)
 
+
+
 ###############################################################################
 # CLEANED => DATAFRAME => CSV
 ##############################################################################
@@ -438,7 +463,7 @@ embarkedTest=embarkedTest.fillna(-1)
 # TRAINING SET
 # New Dataframe
 d={'Survived': df['Survived'], 'Pclass': df['Pclass'], 'Title': title,
-    'Surname': surnames,'Sex': sex, 'Age': age, 'SibSp': df['SibSp'],
+    'Surname': surnames,'Sex': sex, 'Age': df['Age'], 'SibSp': df['SibSp'],
     'Parch': df['Parch'], 'FamSize':famSize, 'isAlone':isAlone,
     'Fare': fareData, 'TktNum': TktNum,'Embarked': embarked,
     'Deck': decks,'CabinNumber': numbers, 'Side': sides,'AgeGroup': ageGroup,
@@ -457,7 +482,7 @@ cleaned_df.to_csv(csvPath)
 # TESTING SET
 # New DataFrame
 dTest={'Pclass': testdf['Pclass'], 'Title': titleTest, 'Surname':surnamesTest,
-    'Sex': sexTest,'Age': ageTest, 'SibSp': testdf['SibSp'],
+    'Sex': sexTest,'Age': testdf['Age'], 'SibSp': testdf['SibSp'],
     'Parch': testdf['Parch'], 'FamSize': famSizeTest, 'isAlone':isAloneTest,
     'TktNum': TktNumTest, 'Fare': fareTestData,'Embarked': embarkedTest,
     'Deck': decksTest, 'CabinNumber': numbersTest,'Side': sidesTest,
