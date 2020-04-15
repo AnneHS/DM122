@@ -155,6 +155,11 @@ for i, entry in enumerate(ageData):
         else:
             ageGroup.append(4)  # Senior
 
+count=0
+for entry in ageGroup:
+    if entry==-1:
+        count+=1
+print(count)
 
 # TEST DATA
 ageTestData = testdf['Age']

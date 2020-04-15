@@ -17,6 +17,7 @@ csvPath = os.path.join(fileDir, filePath)
 csvPath = os.path.abspath(os.path.realpath(csvPath))
 df = pd.read_csv(csvPath, sep=',', engine='python')
 
+
 y = df['Survived']
 x = df[['Pclass', 'Sex' , 'AgeGroup', 'Parch','SibSp', 'TktNum']]# 'Embarked']]#,'Parch', 'SibSp', 'TktNum']]
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.33, random_state=42)
@@ -108,3 +109,10 @@ filePath = '..//data//predictions//' + csvName
 csvPath = os.path.join(fileDir, filePath)
 csvPath = os.path.abspath(os.path.realpath(csvPath))
 prediction_df.to_csv(csvPath)
+
+correlation = df.corr()
+csvName='train_correlation.csv'
+filePath = '..//data//titanic//' + csvName
+csvPath = os.path.join(fileDir, filePath)
+csvPath = os.path.abspath(os.path.realpath(csvPath))
+correlation.to_csv(csvPath)
