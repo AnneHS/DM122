@@ -127,7 +127,7 @@ plotPath = os.path.join(fileDir, filePath) #'../data/test.csv')
 plotPath = os.path.abspath(os.path.realpath(plotPath))
 plotName = 'ClassSurvivalBarChart.png'
 plt.savefig(os.path.join(plotPath, plotName), bbox_inches='tight')
-plt.show()
+#plt.show()
 
 
 ###############################################################################
@@ -171,7 +171,7 @@ plotPath = os.path.join(fileDir, filePath) #'../data/test.csv')
 plotPath = os.path.abspath(os.path.realpath(plotPath))
 plotName = 'GenderSurvivalBarChart.png'
 plt.savefig(os.path.join(plotPath, plotName), bbox_inches='tight')
-plt.show()
+#plt.show()
 
 ###############################################################################
 # EMBARKED VS SURVIVAL
@@ -221,7 +221,7 @@ plotPath = os.path.join(fileDir, filePath) #'../data/test.csv')
 plotPath = os.path.abspath(os.path.realpath(plotPath))
 plotName = 'EmbarkedSurvivalBarChart.png'
 plt.savefig(os.path.join(plotPath, plotName), bbox_inches='tight')
-plt.show()
+#plt.show()
 
 
 ###############################################################################
@@ -315,4 +315,22 @@ plotPath = os.path.join(fileDir, filePath) #'../data/test.csv')
 plotPath = os.path.abspath(os.path.realpath(plotPath))
 plotName = 'AgeGroupSurvivalBarChart.png'
 plt.savefig(os.path.join(plotPath, plotName), bbox_inches='tight')
-plt.show()
+#plt.show()
+
+
+################################################################################
+
+###############################################################################
+# TRAIN DATA
+fileName='train_cleaned.csv'
+filePath = '..//data//titanic_cleaned//' + fileName
+
+# get path
+fileDir = os.path.dirname(os.path.realpath('__file__'))
+csvPath = os.path.join(fileDir, filePath)
+csvPath = os.path.abspath(os.path.realpath(csvPath))
+
+# read data
+df = pd.read_csv(csvPath, sep=',', engine='python')
+correlation = df.corr()
+print(correlation)

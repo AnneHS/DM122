@@ -15,6 +15,8 @@ Cleans train.csv and test.csv => train_cleaned.csv, test_cleaned.csv
 - Age: float
 - SibSp:  int (# of siblings/spoused aboard)
 - Parch: int (# of parents/children aboard)
+- FamSize: int (SibSp + Parch + 1)
+- isAlone: yes:1, no:0
 - Fare**: float (ticket price)
 - Embarked: Cherbourg:1, Queenstown:2, Southampton:3
 - Deck (Cabin): A:0, B:1, C:2, ..., G:6, T:7
@@ -159,7 +161,7 @@ count=0
 for entry in ageGroup:
     if entry==-1:
         count+=1
-print(count)
+#print(count)
 
 # TEST DATA
 ageTestData = testdf['Age']
@@ -180,7 +182,6 @@ for i, entry in enumerate(ageTestData):
         if entry < 14:
             ageGroupTest.append(0)  # Child
         elif entry < 25:
-            print('teen')
             ageGroupTest.append(1)  # Teenager
         elif entry < 35:
             ageGroupTest.append(2)  # Young adult
@@ -190,6 +191,25 @@ for i, entry in enumerate(ageTestData):
             ageGroupTest.append(4)  # Senior
 
 
+##############################################################################
+# FAMILY SIZE & ISALONE (PARCH & SIBSP)
+##############################################################################
+
+# TRAIN
+sibspData=df['SibSp']
+parchData=df['Parch']
+isAlone=[]
+famSize=[]
+isAlone=(sibspData + parchData).apply(lambda x: 0 if x>0 else 1)
+famSize=sibspData+parchData+1
+
+#TEST
+sibspData=testdf['SibSp']
+parchData=testdf['Parch']
+isAloneTest=[]
+famSizeTest=[]
+isAlone=(sibspData + parchData).apply(lambda x: 0 if x>0 else 1)
+famSize=sibspData+parchData+1
 
 ##############################################################################
 # TktNum FROM TICKET
@@ -419,9 +439,10 @@ embarkedTest=embarkedTest.fillna(-1)
 # New Dataframe
 d={'Survived': df['Survived'], 'Pclass': df['Pclass'], 'Title': title,
     'Surname': surnames,'Sex': sex, 'Age': age, 'SibSp': df['SibSp'],
-    'Parch': df['Parch'], 'Fare': fareData, 'TktNum': TktNum,
-    'Embarked': embarked, 'Deck': decks,'CabinNumber': numbers, 'Side': sides,
-    'AgeGroup': ageGroup,'FareGroup':fareGrouped}
+    'Parch': df['Parch'], 'FamSize':famSize, 'isAlone':isAlone,
+    'Fare': fareData, 'TktNum': TktNum,'Embarked': embarked,
+    'Deck': decks,'CabinNumber': numbers, 'Side': sides,'AgeGroup': ageGroup,
+    'FareGroup':fareGrouped}
 cleaned_df = pd.DataFrame(d)
 cleaned_df.index.name='PassengerId'
 
@@ -437,9 +458,10 @@ cleaned_df.to_csv(csvPath)
 # New DataFrame
 dTest={'Pclass': testdf['Pclass'], 'Title': titleTest, 'Surname':surnamesTest,
     'Sex': sexTest,'Age': ageTest, 'SibSp': testdf['SibSp'],
-    'Parch': testdf['Parch'],'TktNum': TktNumTest, 'Fare': fareTestData,
-    'Embarked': embarkedTest,'Deck': decksTest, 'CabinNumber': numbersTest,
-    'Side': sidesTest,'AgeGroup': ageGroupTest, 'FareGroup': fareTestGrouped}
+    'Parch': testdf['Parch'], 'FamSize': famSizeTest, 'isAlone':isAloneTest,
+    'TktNum': TktNumTest, 'Fare': fareTestData,'Embarked': embarkedTest,
+    'Deck': decksTest, 'CabinNumber': numbersTest,'Side': sidesTest,
+    'AgeGroup': ageGroupTest, 'FareGroup': fareTestGrouped}
 cleaned_test=pd.DataFrame(dTest)
 cleaned_test.index.name='PassengerId'
 
