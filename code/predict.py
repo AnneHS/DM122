@@ -109,10 +109,3 @@ filePath = '..//data//predictions//' + csvName
 csvPath = os.path.join(fileDir, filePath)
 csvPath = os.path.abspath(os.path.realpath(csvPath))
 prediction_df.to_csv(csvPath)
-
-correlation = df.corr()
-csvName='train_correlation.csv'
-filePath = '..//data//titanic//' + csvName
-csvPath = os.path.join(fileDir, filePath)
-csvPath = os.path.abspath(os.path.realpath(csvPath))
-correlation.to_csv(csvPath)
