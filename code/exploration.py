@@ -18,6 +18,16 @@ csvPath = os.path.abspath(os.path.realpath(csvPath))
 df = pd.read_csv(csvPath, sep=',', engine='python')
 
 ###############################################################################
+# DESCRIBE CSV
+###############################################################################
+described = df.describe()
+csvName='train_described.csv'
+filePath = '..//data//titanic//' + csvName
+csvPath = os.path.join(fileDir, filePath)
+csvPath = os.path.abspath(os.path.realpath(csvPath))
+described.to_csv(csvPath)
+
+###############################################################################
 # CORRELATION CSV
 ###############################################################################
 correlation = df.corr()
