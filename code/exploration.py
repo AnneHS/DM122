@@ -318,6 +318,100 @@ plt.savefig(os.path.join(plotPath, plotName), bbox_inches='tight')
 #plt.show()
 
 
+###############################################################################
+#CabinBool
+###############################################################################
+cabinBool = df['CabinBool']
+yDeath=0
+ySurvived=0
+nDeath=0
+nSurvived=0
+
+for i, entry in enumerate(cabinBool):
+    if entry == 0:
+        if survivalData.loc[i] == 0:
+            nDeath+=1
+        elif survivalData.loc[i] ==1:
+            nSurvived+=1
+    if entry == 1:
+        if survivalData.loc[i] == 0:
+            yDeath+=1
+        elif survivalData.loc[i] ==1:
+            ySurvived+=1
+
+deathTotals = (yDeath, nDeath)
+survivalTotals = (ySurvived, nSurvived)
+
+print(cDeath)
+
+N=2
+fig, ax = plt.subplots()
+ind = np.arange(N)    # the x locations for the groups
+width = 0.35         # the width of the bars
+p1 = ax.bar(ind, survivalTotals, width, bottom=0)
+p2 =  ax.bar(ind+width, deathTotals, width, bottom=0)
+ax.set_xticks(ind + width / 2)
+ax.set_xticklabels(('Yes', 'No'))
+ax.legend((p1[0], p2[0]), ('Survived', 'Death'))
+
+# Save plot
+filePath='..//plots//titanic//'
+fileDir = os.path.dirname(os.path.realpath('__file__'))
+plotPath = os.path.join(fileDir, filePath) #'../data/test.csv')
+plotPath = os.path.abspath(os.path.realpath(plotPath))
+plotName = 'CabinBoolBarChart.png'
+plt.savefig(os.path.join(plotPath, plotName), bbox_inches='tight')
+plt.title('CabinBool')
+plt.show()
+
+
+###############################################################################
+#isAlone
+###############################################################################
+isAlone=df['isAlone']
+yDeath=0
+ySurvived=0
+nDeath=0
+nSurvived=0
+
+for i, entry in enumerate(isAlone):
+    if entry == 0:
+        if survivalData.loc[i] == 0:
+            nDeath+=1
+        elif survivalData.loc[i] ==1:
+            nSurvived+=1
+    if entry == 1:
+        if survivalData.loc[i] == 0:
+            yDeath+=1
+        elif survivalData.loc[i] ==1:
+            ySurvived+=1
+
+
+deathTotals = (yDeath, nDeath)
+survivalTotals = (ySurvived, nSurvived)
+
+print(cDeath)
+
+N=2
+fig, ax = plt.subplots()
+ind = np.arange(N)    # the x locations for the groups
+width = 0.35         # the width of the bars
+p1 = ax.bar(ind, survivalTotals, width, bottom=0)
+p2 =  ax.bar(ind+width, deathTotals, width, bottom=0)
+ax.set_xticks(ind + width / 2)
+ax.set_xticklabels(('Yes', 'No'))
+ax.legend((p1[0], p2[0]), ('Survived', 'Death'))
+
+# Save plot
+filePath='..//plots//titanic//'
+fileDir = os.path.dirname(os.path.realpath('__file__'))
+plotPath = os.path.join(fileDir, filePath) #'../data/test.csv')
+plotPath = os.path.abspath(os.path.realpath(plotPath))
+plotName = 'isAloneBarChart.png'
+plt.savefig(os.path.join(plotPath, plotName), bbox_inches='tight')
+plt.title('isAlone')
+plt.show()
+
 ################################################################################
 
 ###############################################################################
