@@ -70,8 +70,8 @@ dataName=df['Name']
 
 # Replace various titles with more common title
 title=dataName.str.extract(' ([A-Za-z]+)\.', expand=False)
-title=title.replace(['Mlle','Ms','Countess','Miss','Mme'], 'Mrs')
-title=title.replace(['Major','Sir','Capt','Col','Don','Jonkheer','Rev','Master','Lady'], 'Mr')
+title=title.replace(['Mlle','Ms','Countess','Miss','Mme', 'Lady'], 'Mrs')
+title=title.replace(['Major','Sir','Capt','Col','Don','Jonkheer','Rev','Master'], 'Mr')
 
 # Mapping
 title_mapping={'Dr':0, 'Mr':1, 'Mrs':2}
@@ -79,14 +79,13 @@ title=title.map(title_mapping)
 title=title.fillna(-1)
 
 
-
 # TEST DATA
 testName=testdf['Name']
 
 # Replace various titles with more common title
 titleTest=testName.str.extract(' ([A-Za-z]+)\.', expand=False)
-titleTest=titleTest.replace(['Mlle','Ms','Countess','Miss','Mme'], 'Mrs')
-titleTest=titleTest.replace(['Major','Sir','Capt','Col','Don','Jonkheer','Rev','Master','Lady'], 'Mr')
+titleTest=titleTest.replace(['Mlle','Ms','Countess','Miss','Mme', 'Lady'], 'Mrs')
+titleTest=titleTest.replace(['Major','Sir','Capt','Col','Don','Jonkheer','Rev','Master'], 'Mr')
 
 # Mapping
 titleTest=titleTest.map(title_mapping)
@@ -217,18 +216,14 @@ for i, entry in enumerate(ageTestData):
 # TRAIN
 sibspData=df['SibSp']
 parchData=df['Parch']
-isAlone=[]
-famSize=[]
 isAlone=(sibspData + parchData).apply(lambda x: 0 if x>0 else 1)
 famSize=sibspData+parchData+1
 
 #TEST
 sibspData=testdf['SibSp']
 parchData=testdf['Parch']
-isAloneTest=[]
-famSizeTest=[]
-isAlone=(sibspData + parchData).apply(lambda x: 0 if x>0 else 1)
-famSize=sibspData+parchData+1
+isAloneTest=(sibspData + parchData).apply(lambda x: 0 if x>0 else 1)
+famSizeTest=sibspData+parchData+1
 
 
 
@@ -311,12 +306,15 @@ deck_dict={'A':0, 'B':1, 'C':2, 'D':3, 'E':4, 'F':5, 'G':6, 'T':7}
 decks=[]
 numbers=[]
 sides=[]
+cabinBool=[]
 for i, entry in enumerate(cabinData):
     if i in rows:
         decks.append(-1)
         numbers.append(-1)
         sides.append(-1)
+        cabinBool.append(0)
     else:
+        cabinBool.append(1)
         cabins = entry.split()
 
         # One cabin
@@ -379,12 +377,15 @@ rows=loc[0]
 decksTest=[]
 numbersTest=[]
 sidesTest=[]
+cabinBoolTest=[]
 for i, entry in enumerate(cabinTestData):
     if i in rows:
         decksTest.append(-1)
         numbersTest.append(-1)
         sidesTest.append(-1)
+        cabinBoolTest.append(0)
     else:
+        cabinBoolTest.append(1)
         cabins = entry.split()
 
         # One cabin
@@ -466,8 +467,8 @@ d={'Survived': df['Survived'], 'Pclass': df['Pclass'], 'Title': title,
     'Surname': surnames,'Sex': sex, 'Age': df['Age'], 'SibSp': df['SibSp'],
     'Parch': df['Parch'], 'FamSize':famSize, 'isAlone':isAlone,
     'Fare': fareData, 'TktNum': TktNum,'Embarked': embarked,
-    'Deck': decks,'CabinNumber': numbers, 'Side': sides,'AgeGroup': ageGroup,
-    'FareGroup':fareGrouped}
+    'CabinBool': cabinBool,'Deck': decks,'CabinNumber': numbers, 'Side': sides,
+    'AgeGroup': ageGroup,'FareGroup':fareGrouped}
 cleaned_df = pd.DataFrame(d)
 cleaned_df.index.name='PassengerId'
 
@@ -485,8 +486,8 @@ dTest={'Pclass': testdf['Pclass'], 'Title': titleTest, 'Surname':surnamesTest,
     'Sex': sexTest,'Age': testdf['Age'], 'SibSp': testdf['SibSp'],
     'Parch': testdf['Parch'], 'FamSize': famSizeTest, 'isAlone':isAloneTest,
     'TktNum': TktNumTest, 'Fare': fareTestData,'Embarked': embarkedTest,
-    'Deck': decksTest, 'CabinNumber': numbersTest,'Side': sidesTest,
-    'AgeGroup': ageGroupTest, 'FareGroup': fareTestGrouped}
+    'CabinBool': cabinBoolTest, 'Deck': decksTest, 'CabinNumber': numbersTest,
+    'Side': sidesTest,'AgeGroup': ageGroupTest, 'FareGroup': fareTestGrouped}
 cleaned_test=pd.DataFrame(dTest)
 cleaned_test.index.name='PassengerId'
 
